@@ -1,0 +1,18 @@
+{
+    "name": "ContextCircleMenu.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:2b2271c5ce4f33d47b19008741bb192f"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
