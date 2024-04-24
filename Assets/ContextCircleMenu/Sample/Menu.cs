@@ -16,5 +16,30 @@ namespace ContextCircleMenu.Sample
         {
             Debug.Log("TestMethod2");
         }
+
+        [CircularMenu("Example/Test3", EditorIcons.AnimationRecord)]
+        public static void TestMethod3()
+        {
+            Debug.Log("TestMethod3");
+        }
+
+        [CircularMenu("Example/Test4", EditorIcons.AnimationRecord)]
+        public static void TestMethod4()
+        {
+            Debug.Log("TestMethod4");
+        }
+
+        [CircularMenu("Example/Test5", EditorIcons.AnimationRecord)]
+        public static void TestMethod5()
+        {
+            Debug.Log("TestMethod5");
+        }
+
+
+        [CircularMenu("Example/Scene/Test", EditorIcons.AnimationRecord)]
+        public static void TestMethod6()
+        {
+            Debug.Log("TestMethod6");
+        }
     }
 }

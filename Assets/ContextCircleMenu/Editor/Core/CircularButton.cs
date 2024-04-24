@@ -1,25 +1,30 @@
 using System;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace ContextCircleMenu.Editor
 {
-    public sealed class CircularMenuButton : VisualElement
+    public sealed class CircularButton : VisualElement
     {
         private readonly Button _button;
         private readonly Color _hoverColor = new(0.2745098f, 0.3764706f, 0.4862745f, 1.0f);
         private readonly Color _normalColor = new(0.02f, 0.02f, 0.02f, 0.8f);
-        public readonly int Section;
+        private readonly Action _onSelect;
+        private readonly bool _shouldCloseMenuAfterSelect;
+        public bool IsEntered;
 
 
-        public CircularMenuButton(string text, GUIContent icon, int section, Action onClick)
+        public CircularButton(string text, GUIContent icon, int section, Action onSelect,
+            bool shouldCloseMenuAfterSelect = true)
         {
-            Section = section;
+            _onSelect = onSelect;
+            _shouldCloseMenuAfterSelect = shouldCloseMenuAfterSelect;
 
             style.position = Position.Absolute;
             style.alignItems = Align.Center;
 
-            _button = new Button(onClick)
+            _button = new Button(onSelect)
             {
                 style =
                 {
@@ -85,12 +90,34 @@ namespace ContextCircleMenu.Editor
             }
 
             Add(_button);
+
+            RegisterCallback<MouseEnterEvent>(OnMouseEnter);
+            RegisterCallback<MouseLeaveEvent>(OnMouseLeave);
+        }
+
+        internal bool ForceSelect()
+        {
+            _onSelect?.Invoke();
+            return _shouldCloseMenuAfterSelect;
+        }
+
+        private void OnMouseEnter(MouseEnterEvent evt)
+        {
+            IsEntered = true;
+            _button.style.backgroundColor = _hoverColor;
+        }
+
+        private void OnMouseLeave(MouseLeaveEvent evt)
+        {
+            IsEntered = false;
+            _button.style.backgroundColor = _normalColor;
         }
 
 
-        public void Hover(bool active)
+        public static CircularButton CreateBackButton(Action back)
         {
-            _button.style.backgroundColor = active ? _hoverColor : _normalColor;
+            return new CircularButton("Back",
+                EditorGUIUtility.IconContent(EditorIcons.Back2x), -1, back, false);
         }
     }
 }

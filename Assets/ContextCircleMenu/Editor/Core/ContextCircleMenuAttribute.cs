@@ -10,9 +10,6 @@ namespace ContextCircleMenu.Editor
         public GUIContent Icon;
         public string Path;
 
-        public CircularMenuAttribute()
-        {
-        }
 
         public CircularMenuAttribute(string path, string icon) : this(path, EditorGUIUtility.IconContent(icon))
         {
