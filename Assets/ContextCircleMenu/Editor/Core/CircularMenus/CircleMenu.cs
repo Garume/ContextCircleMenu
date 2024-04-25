@@ -1,6 +1,6 @@
 using System;
+using System.Buffers;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -27,7 +27,7 @@ namespace ContextCircleMenu.Editor
             ShouldCloseMenuAfterSelection = shouldCloseMenuAfterSelection;
         }
 
-        internal IEnumerable<VisualElement> CreateElements()
+        internal ReadOnlySpan<VisualElement> CreateElements()
         {
             var buttons = CreateButtons();
             var utilityElements = CreateUtilityElements();
@@ -40,8 +40,13 @@ namespace ContextCircleMenu.Editor
                 button.experimental.animation.Position(to, 100);
             }
 
-            // buttonsとutilityElementsを結合して返す
-            return buttons.Concat(utilityElements).ToArray();
+            var pool = ArrayPool<VisualElement>.Shared;
+            var buffer = pool.Rent(buttons.Length + utilityElements.Length);
+            buttons.CopyTo(buffer, 0);
+            utilityElements.CopyTo(buffer, buttons.Length);
+            var combinedSpan = new Span<VisualElement>(buffer, 0, buttons.Length + utilityElements.Length);
+            pool.Return(buffer);
+            return combinedSpan;
         }
 
         protected abstract VisualElement[] CreateButtons();

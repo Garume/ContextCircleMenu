@@ -1,3 +1,4 @@
+using System;
 using System.Reflection;
 using UnityEditor;
 using UnityEditor.ShortcutManagement;
@@ -6,13 +7,15 @@ using UnityEngine;
 namespace ContextCircleMenu.Editor
 {
     [InitializeOnLoad]
-    public class ContextCircleMenuLoader
+    public static class ContextCircleMenuLoader
     {
         private static SceneView _activeSceneView;
         private static int _activeSceneViewInstanceID;
 
         private static ContextCircleMenu _contextCircleMenu;
         private static readonly Vector2 RadialMenuSize = new(100, 100);
+
+        private static Action<CircleMenuBuilder> _onBuild;
 
 
         static ContextCircleMenuLoader()
@@ -48,17 +51,26 @@ namespace ContextCircleMenu.Editor
             _contextCircleMenu =
                 new ContextCircleMenu(RadialMenuSize.x, RadialMenuSize.y, _activeSceneView.rootVisualElement);
 
-            _contextCircleMenu.CreateMenu(builder =>
-            {
-                var attributes = TypeCache.GetMethodsWithAttribute<CircularMenuAttribute>();
-                foreach (var method in attributes)
+            if (_onBuild == null)
+                _contextCircleMenu.CreateMenu(builder =>
                 {
-                    var attribute = method.GetCustomAttribute<CircularMenuAttribute>(false);
-                    builder.AddMenu(attribute.Path, attribute, method);
-                }
-            });
+                    var attributes = TypeCache.GetMethodsWithAttribute<ContextCircleMenuAttribute>();
+                    foreach (var method in attributes)
+                    {
+                        var attribute = method.GetCustomAttribute<ContextCircleMenuAttribute>(false);
+                        builder.AddMenu(attribute.Path, attribute, method);
+                    }
+                });
+            else
+                _contextCircleMenu.CreateMenu(_onBuild);
 
             _activeSceneView.rootVisualElement.Add(_contextCircleMenu);
+        }
+
+        public static event Action<CircleMenuBuilder> OnBuild
+        {
+            add => _onBuild += value;
+            remove => _onBuild -= value;
         }
 
 

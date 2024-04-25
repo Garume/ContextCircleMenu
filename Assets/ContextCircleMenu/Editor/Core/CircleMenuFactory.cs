@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
@@ -7,17 +8,17 @@ namespace ContextCircleMenu.Editor
 {
     public class AttributeCircleMenuFactory : ICircleMenuFactory
     {
-        private readonly CircularMenuAttribute _attribute;
+        private readonly ContextCircleMenuAttribute _attribute;
         private readonly MethodInfo _method;
 
-        public AttributeCircleMenuFactory(string path, CircularMenuAttribute attribute, MethodInfo method)
+        public AttributeCircleMenuFactory(string path, ContextCircleMenuAttribute attribute, MethodInfo method)
         {
             PathSegments = path.Split("/");
             _attribute = attribute;
             _method = method;
         }
 
-        public string[] PathSegments { get; }
+        public IEnumerable<string> PathSegments { get; }
 
         public CircleMenu Create()
         {
@@ -37,11 +38,31 @@ namespace ContextCircleMenu.Editor
             _action = action;
         }
 
-        public string[] PathSegments { get; }
+        public IEnumerable<string> PathSegments { get; }
 
         public CircleMenu Create()
         {
             return new LeafCircleMenu(PathSegments.Last(), _content, _action);
+        }
+    }
+
+    public class RootMenuFactory : ICircleMenuFactory
+    {
+        public IEnumerable<string> PathSegments => null;
+
+        public CircleMenu Create()
+        {
+            return new RootCircleMenu();
+        }
+    }
+
+    public class FolderMenuFactory : IFolderCircleMenuFactory
+    {
+        public int Radius { get; set; } = 100;
+
+        public CircleMenu Create(string path, Action onSelected, Action onBack, CircleMenu parent)
+        {
+            return new FolderCircleMenu(path, onSelected, onBack, parent, Radius);
         }
     }
 }

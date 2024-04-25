@@ -130,7 +130,7 @@ namespace ContextCircleMenu.Editor
         {
             Clear();
             var elements = _selectedMenu.CreateElements();
-            foreach (var element in elements) Add(element);
+            for (var i = 0; i < elements.Length; i++) Add(elements[i]);
         }
 
         private void OnGenerateVisualContent(MeshGenerationContext context)

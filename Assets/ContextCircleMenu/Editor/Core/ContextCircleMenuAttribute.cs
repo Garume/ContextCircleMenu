@@ -5,17 +5,22 @@ using UnityEngine;
 namespace ContextCircleMenu.Editor
 {
     [AttributeUsage(AttributeTargets.Method)]
-    public class CircularMenuAttribute : Attribute
+    public class ContextCircleMenuAttribute : Attribute
     {
         public GUIContent Icon;
         public string Path;
 
 
-        public CircularMenuAttribute(string path, string icon) : this(path, EditorGUIUtility.IconContent(icon))
+        public ContextCircleMenuAttribute(string path) : this(path, new GUIContent())
+        {
+            
+        }
+        
+        public ContextCircleMenuAttribute(string path, string icon) : this(path, EditorGUIUtility.IconContent(icon))
         {
         }
 
-        public CircularMenuAttribute(string path, GUIContent icon)
+        public ContextCircleMenuAttribute(string path, GUIContent icon)
         {
             Path = path;
             Icon = icon;
