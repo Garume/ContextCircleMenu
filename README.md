@@ -68,7 +68,7 @@ Context Circle Menu is a simple open-source tool for Unity. It lets users open a
 3. Enter the following URL
 
 ```
-https://github.com/Garume/Context-Circle-Menu.git?path=/Assets/ContextCicleMenu
+https://github.com/Garume/ContextCircleMenu.git?path=/Assets/ContextCircleMenu
 ```
 
 Or open Packages/manifest.json and add the following to the dependencies block
@@ -76,7 +76,7 @@ Or open Packages/manifest.json and add the following to the dependencies block
 ```
 {
     "dependencies": {
-        "com.garume.context-circle-menu": "https://github.com/Garume/Context-Circle-Menu.git?path=/Assets/ContextCicleMenu"
+        "com.garume.context-circle-menu": "https://github.com/Garume/ContextCircleMenu.git?path=/Assets/ContextCircleMenu"
     }
 }
 ```

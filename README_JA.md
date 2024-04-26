@@ -68,7 +68,7 @@ Context Circle Menu はUnity用のシンプルなツールです。円形のメ�
 3. 以下を入力する
 
 ```
-https://github.com/Garume/Context-Circle-Menu.git?path=/Assets/ContextCicleMenu
+https://github.com/Garume/ContextCircleMenu.git?path=/Assets/ContextCircleMenu
 ```
 
 あるいはPackages/manifest.jsonを開き、dependenciesブロックに以下を追記
@@ -76,7 +76,7 @@ https://github.com/Garume/Context-Circle-Menu.git?path=/Assets/ContextCicleMenu
 ```
 {
     "dependencies": {
-        "com.garume.context-circle-menu": "https://github.com/Garume/Context-Circle-Menu.git?path=/Assets/ContextCicleMenu"
+        "com.garume.context-circle-menu": "https://github.com/Garume/ContextCircleMenu.git?path=/Assets/ContextCircleMenu"
     }
 }
 ```
