@@ -2,7 +2,7 @@
 
 Context Circle Menu is Unity tool that allows users to open a circular menu in the Scene view to quickly execute user-defined methods, enhancing workflow efficiency.
 
-<img src="ContextCircleMenu Logo.png" width="400">
+<img src="docs/ContextCircleMenu Logo.png" width="400">
 
 [![license](https://img.shields.io/badge/LICENSE-MIT-green.svg)](LICENSE)
 ![Unity 2022.3+](https://img.shields.io/badge/unity-2022.3+-000.svg)
