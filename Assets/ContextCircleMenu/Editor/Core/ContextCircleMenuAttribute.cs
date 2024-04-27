@@ -7,8 +7,8 @@ namespace ContextCircleMenu.Editor
     [AttributeUsage(AttributeTargets.Method)]
     public class ContextCircleMenuAttribute : Attribute
     {
-        public GUIContent Icon;
-        public string Path;
+        public readonly GUIContent Icon;
+        public readonly string Path;
 
 
         public ContextCircleMenuAttribute(string path) : this(path, new GUIContent())

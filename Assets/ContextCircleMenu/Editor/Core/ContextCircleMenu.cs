@@ -5,7 +5,7 @@ using UnityEngine.UIElements;
 
 namespace ContextCircleMenu.Editor
 {
-    public class ContextCircleMenu : VisualElement
+    public class ContextCircleMenu : VisualElement, IMenuControllable
     {
         private static readonly Color AnnulusColor = new(0.02f, 0.02f, 0.02f, 0.8f);
         private static readonly Color MouseAngleIndicatorBackgroundColor = new(0.01f, 0.01f, 0.01f, 1.0f);
@@ -18,7 +18,6 @@ namespace ContextCircleMenu.Editor
         private Vector2 _mousePosition;
         private Vector2 _position;
 
-        private CircleMenu _rootMenu;
         private CircleMenu _selectedMenu;
 
         public ContextCircleMenu(float width, float height, VisualElement target)
@@ -51,6 +50,37 @@ namespace ContextCircleMenu.Editor
 
 
         public bool IsVisible => style.display == DisplayStyle.Flex;
+
+
+        public void Show()
+        {
+            if (IsVisible) return;
+
+            style.display = DisplayStyle.Flex;
+            _position = _mousePosition;
+            transform.position = _position - new Vector2(_width * 0.5f, _height * 0.5f);
+            Rebuild();
+        }
+
+        public void Hide()
+        {
+            if (!IsVisible) return;
+
+            style.display = DisplayStyle.None;
+        }
+
+        public void Open(CircleMenu menu)
+        {
+            if (!IsVisible) return;
+
+            _selectedMenu = menu;
+            Rebuild();
+        }
+
+        public void Back()
+        {
+            if (_selectedMenu.Parent != null) Open(_selectedMenu.Parent);
+        }
 
 
         private void OnAttach(AttachToPanelEvent evt)
@@ -89,41 +119,10 @@ namespace ContextCircleMenu.Editor
             Hide();
         }
 
-
-        public void Show()
-        {
-            if (IsVisible) return;
-
-            style.display = DisplayStyle.Flex;
-            _position = _mousePosition;
-            transform.position = _position - new Vector2(_width * 0.5f, _height * 0.5f);
-            Rebuild();
-        }
-
-        public void Hide()
-        {
-            if (!IsVisible) return;
-
-            style.display = DisplayStyle.None;
-        }
-
-        public void Open(CircleMenu menu)
-        {
-            if (!IsVisible) return;
-
-            _selectedMenu = menu;
-            Rebuild();
-        }
-
-        public void Back()
-        {
-            if (_selectedMenu.Parent != null) Open(_selectedMenu.Parent);
-        }
-
-        public bool ForceSelectIfExistEnteredButton()
+        public bool TryForceSelect()
         {
             var button = Children().OfType<CircularButton>().FirstOrDefault(b => b.IsEntered);
-            return button != null && button.ForceSelect();
+            return button != null && button.TryForceSelect();
         }
 
         private void Rebuild()
@@ -171,9 +170,7 @@ namespace ContextCircleMenu.Editor
             var builder = new CircleMenuBuilder();
             configureMenu(builder);
 
-            _rootMenu?.Children.Clear();
-            _rootMenu = builder.Build(Open);
-            _selectedMenu = _rootMenu;
+            _selectedMenu = builder.Build(this);
         }
     }
 }

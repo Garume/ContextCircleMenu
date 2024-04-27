@@ -12,7 +12,7 @@ namespace ContextCircleMenu.Editor
         private IFolderCircleMenuFactory _folderFactory;
         private ICircleMenuFactory _rootFactory;
 
-        internal CircleMenu Build(Action<CircleMenu> open)
+        internal CircleMenu Build(IMenuControllable menu)
         {
             _rootFactory ??= new RootMenuFactory();
             _folderFactory ??= new FolderMenuFactory();
@@ -27,8 +27,7 @@ namespace ContextCircleMenu.Editor
                     var child = currentMenu.Children.Find(m => m.Path == pathSegment);
                     if (child == null)
                     {
-                        child = _folderFactory.Create(pathSegment, () => open(child), () => open(child.Parent),
-                            currentMenu);
+                        child = _folderFactory.Create(pathSegment, menu, currentMenu);
                         currentMenu.Children.Add(child);
                     }
 
