@@ -9,12 +9,15 @@ namespace ContextCircleMenu.Editor
     {
         private readonly Action _onBack;
 
-        public FolderCircleMenu(string path, Action onSelected, Action onBack, CircleMenu parent, int radius = 100) :
-            base(path,
-                EditorGUIUtility.IconContent(EditorIcons.FolderIcon), onSelected, parent, radius, false)
+        public FolderCircleMenu(string path, Action<CircleMenu> onOpen, Action onBack, CircleMenu parent,
+            int radius = 100) :
+            base(path, EditorGUIUtility.IconContent(EditorIcons.FolderIcon),
+                null, parent, radius, false)
         {
+            OnSelected = () => onOpen(this);
             _onBack = onBack;
         }
+
 
         protected override VisualElement[] CreateButtons()
         {

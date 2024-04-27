@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 
 namespace ContextCircleMenu.Editor
@@ -11,6 +10,6 @@ namespace ContextCircleMenu.Editor
 
     public interface IFolderCircleMenuFactory
     {
-        public CircleMenu Create(string path, Action onSelected, Action onBack, CircleMenu parent);
+        public CircleMenu Create(string path, IMenuControllable menu, CircleMenu parent);
     }
 }

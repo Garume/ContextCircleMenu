@@ -60,9 +60,9 @@ namespace ContextCircleMenu.Editor
     {
         public int Radius { get; set; } = 100;
 
-        public CircleMenu Create(string path, Action onSelected, Action onBack, CircleMenu parent)
+        public CircleMenu Create(string path, IMenuControllable menu, CircleMenu parent)
         {
-            return new FolderCircleMenu(path, onSelected, onBack, parent, Radius);
+            return new FolderCircleMenu(path, menu.Open, menu.Back, parent, Radius);
         }
     }
 }

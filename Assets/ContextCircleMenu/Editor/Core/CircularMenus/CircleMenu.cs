@@ -11,10 +11,10 @@ namespace ContextCircleMenu.Editor
         private readonly int _radius;
         protected internal readonly List<CircleMenu> Children = new();
         protected internal readonly GUIContent Icon;
-        protected internal readonly Action OnSelected;
         protected internal readonly CircleMenu Parent;
         protected internal readonly string Path;
         protected internal readonly bool ShouldCloseMenuAfterSelection;
+        protected internal Action OnSelected;
 
         public CircleMenu(string path, GUIContent icon, Action onSelected, CircleMenu parent, int radius = 100,
             bool shouldCloseMenuAfterSelection = true)
