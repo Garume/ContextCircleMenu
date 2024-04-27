@@ -86,7 +86,7 @@ namespace ContextCircleMenu.Editor
 
             if (_contextCircleMenu.IsVisible)
             {
-                if (args.stage == ShortcutStage.End && _contextCircleMenu.ForceSelectIfExistEnteredButton())
+                if (args.stage == ShortcutStage.End && _contextCircleMenu.TryForceSelect())
                     _contextCircleMenu.Hide();
             }
             else

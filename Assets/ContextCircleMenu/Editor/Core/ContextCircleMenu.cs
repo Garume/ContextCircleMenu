@@ -119,11 +119,10 @@ namespace ContextCircleMenu.Editor
             Hide();
         }
 
-
-        public bool ForceSelectIfExistEnteredButton()
+        public bool TryForceSelect()
         {
             var button = Children().OfType<CircularButton>().FirstOrDefault(b => b.IsEntered);
-            return button != null && button.ForceSelect();
+            return button != null && button.TryForceSelect();
         }
 
         private void Rebuild()

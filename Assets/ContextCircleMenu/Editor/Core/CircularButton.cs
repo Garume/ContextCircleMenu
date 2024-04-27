@@ -95,7 +95,7 @@ namespace ContextCircleMenu.Editor
             RegisterCallback<MouseLeaveEvent>(OnMouseLeave);
         }
 
-        internal bool ForceSelect()
+        internal bool TryForceSelect()
         {
             _onSelect?.Invoke();
             return _shouldCloseMenuAfterSelect;
