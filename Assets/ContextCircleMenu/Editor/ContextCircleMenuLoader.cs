@@ -58,7 +58,7 @@ namespace ContextCircleMenu.Editor
                     foreach (var method in attributes)
                     {
                         var attribute = method.GetCustomAttribute<ContextCircleMenuAttribute>(false);
-                        builder.AddMenu(attribute.Path, attribute, method);
+                        builder.AddMenu(attribute, method);
                     }
                 });
             else
@@ -66,10 +66,7 @@ namespace ContextCircleMenu.Editor
 
             _activeSceneView.rootVisualElement.Add(_contextCircleMenu);
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
+        
         public static event Action<CircleMenuBuilder> OnBuild
         {
             add => _onBuild += value;

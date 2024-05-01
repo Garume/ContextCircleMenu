@@ -2,27 +2,36 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using UnityEditor;
 using UnityEngine;
 
 namespace ContextCircleMenu.Editor
 {
     public class AttributeCircleMenuFactory : ICircleMenuFactory
     {
-        private readonly ContextCircleMenuAttribute _attribute;
+        private readonly GUIContent _content = new();
         private readonly MethodInfo _method;
 
-        public AttributeCircleMenuFactory(string path, ContextCircleMenuAttribute attribute, MethodInfo method)
+        public AttributeCircleMenuFactory(ContextCircleMenuAttribute attribute, MethodInfo method)
         {
-            PathSegments = path.Split("/");
-            _attribute = attribute;
+            PathSegments = attribute.Path.Split("/");
             _method = method;
+            
+            if (attribute.Icon != null)
+            {
+                _content = attribute.Icon;
+            }
+            else if (!string.IsNullOrEmpty(attribute.IconPath))
+            {
+                _content = EditorGUIUtility.IconContent(attribute.IconPath);
+            }
         }
 
         public IEnumerable<string> PathSegments { get; }
 
         public CircleMenu Create()
         {
-            return new LeafCircleMenu(PathSegments.Last(), _attribute.Icon, () => _method.Invoke(null, null));
+            return new LeafCircleMenu(PathSegments.Last(), _content, () => _method.Invoke(null, null));
         }
     }
 

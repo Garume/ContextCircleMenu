@@ -40,9 +40,9 @@ namespace ContextCircleMenu.Editor
             return root;
         }
 
-        public void AddMenu(string attributePath, ContextCircleMenuAttribute attribute, MethodInfo method)
+        public void AddMenu(ContextCircleMenuAttribute attribute, MethodInfo method)
         {
-            AddMenu(new AttributeCircleMenuFactory(attributePath, attribute, method));
+            AddMenu(new AttributeCircleMenuFactory(attribute, method));
         }
 
         public void AddMenu(string path, GUIContent content, Action action)
