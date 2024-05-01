@@ -6,6 +6,9 @@ using UnityEngine;
 
 namespace ContextCircleMenu.Editor
 {
+    /// <summary>
+    ///     Initializes and manages the Context Circle Menu within the Unity Scene View.
+    /// </summary>
     [InitializeOnLoad]
     public static class ContextCircleMenuLoader
     {
@@ -67,6 +70,26 @@ namespace ContextCircleMenu.Editor
             _activeSceneView.rootVisualElement.Add(_contextCircleMenu);
         }
         
+
+        /// <summary>
+        ///     Event that allows customization of the Context Circle Menu construction.
+        /// </summary>
+        /// <remarks>
+        ///     This event provides a mechanism to extend or modify the content of the Context Circle Menu
+        ///     dynamically at runtime. It's invoked during the initialization phase of the menu in the Scene View.
+        ///     Subscribers can add custom menu items or modify existing ones by manipulating the CircleMenuBuilder
+        ///     instance provided in the event arguments.
+        ///     Example Usage:
+        ///     ContextCircleMenuLoader.OnBuild += builder =>
+        ///     {
+        ///     // Adds a nested menu item under "Custom" with an action to log "custom/test" to the console
+        ///     builder.AddMenu("Custom/Debug Test", new GUIContent(), () => Debug.Log("custom/test"));
+        ///     // Adds another top-level menu item with an action to log "test"
+        ///     builder.AddMenu("Debug Test", new GUIContent(), () => Debug.Log("test"));
+        ///     };
+        ///     This example demonstrates how developers can add items that perform actions like logging to the console,
+        ///     but it could also be used to trigger any method reflecting more complex functionality.
+        /// </remarks>
         public static event Action<CircleMenuBuilder> OnBuild
         {
             add => _onBuild += value;
@@ -74,6 +97,9 @@ namespace ContextCircleMenu.Editor
         }
 
 
+        /// <summary>
+        ///     Shortcut that toggles the visibility of the Context Circle Menu based on keyboard input.
+        /// </summary>
         [ClutchShortcut("Context Circle Menu/Show Menu", typeof(SceneView), KeyCode.A)]
         public static void ToggleMenuClutch(ShortcutArguments args)
         {
