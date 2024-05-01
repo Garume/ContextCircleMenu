@@ -9,22 +9,17 @@ namespace ContextCircleMenu.Editor
 {
     public class AttributeCircleMenuFactory : ICircleMenuFactory
     {
-        private readonly GUIContent _content = new();
+        private readonly GUIContent _content;
         private readonly MethodInfo _method;
 
         public AttributeCircleMenuFactory(ContextCircleMenuAttribute attribute, MethodInfo method)
         {
             PathSegments = attribute.Path.Split("/");
             _method = method;
-            
-            if (attribute.Icon != null)
-            {
-                _content = attribute.Icon;
-            }
-            else if (!string.IsNullOrEmpty(attribute.IconPath))
-            {
-                _content = EditorGUIUtility.IconContent(attribute.IconPath);
-            }
+
+            _content = !string.IsNullOrEmpty(attribute.IconPath)
+                ? EditorGUIUtility.IconContent(attribute.IconPath)
+                : default;
         }
 
         public IEnumerable<string> PathSegments { get; }
