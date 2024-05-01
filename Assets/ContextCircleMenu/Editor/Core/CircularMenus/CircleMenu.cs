@@ -6,6 +6,9 @@ using UnityEngine.UIElements;
 
 namespace ContextCircleMenu.Editor
 {
+    /// <summary>
+    ///     Represents a menu item in the circle menu.
+    /// </summary>
     public abstract class CircleMenu
     {
         private readonly int _radius;
@@ -52,8 +55,16 @@ namespace ContextCircleMenu.Editor
             return combinedSpan;
         }
 
+        /// <summary>
+        ///     Creates the buttons for the menu.
+        /// </summary>
+        /// <returns></returns>
         protected abstract VisualElement[] CreateButtons();
 
+        /// <summary>
+        ///     Creates the utility elements for the menu.
+        /// </summary>
+        /// <returns></returns>
         protected virtual VisualElement[] CreateUtilityElements()
         {
             return null;
