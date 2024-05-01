@@ -1,6 +1,6 @@
 // Reference: https://github.com/AnnulusGames/UnityEditorIcons/blob/main/Assets/UnityEditorIcons/Editor/EditorIcons.csusing
 
-namespace ContextCircleMenu.Editor
+namespace ContextCircleMenu
 {
     public static class EditorIcons
     {

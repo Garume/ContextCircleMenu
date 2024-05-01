@@ -5,6 +5,7 @@ using UnityEngine.UIElements;
 
 namespace ContextCircleMenu.Editor
 {
+    /// <inheritdoc />
     public class FolderCircleMenu : CircleMenu
     {
         private readonly Action _onBack;
@@ -18,7 +19,7 @@ namespace ContextCircleMenu.Editor
             _onBack = onBack;
         }
 
-
+        /// <inheritdoc />
         protected override VisualElement[] CreateButtons()
         {
             var buttons = new VisualElement[Children.Count + 1];
@@ -38,6 +39,7 @@ namespace ContextCircleMenu.Editor
             return buttons;
         }
 
+        /// <inheritdoc />
         protected override VisualElement[] CreateUtilityElements()
         {
             var label = new Label(Path)

@@ -6,6 +6,9 @@ using UnityEngine.UIElements;
 
 namespace ContextCircleMenu.Editor
 {
+    /// <summary>
+    ///     Represents a menu item in the circle menu.
+    /// </summary>
     public abstract class CircleMenu
     {
         private readonly int _radius;
@@ -14,6 +17,9 @@ namespace ContextCircleMenu.Editor
         protected internal readonly CircleMenu Parent;
         protected internal readonly string Path;
         protected internal readonly bool ShouldCloseMenuAfterSelection;
+
+        private VisualElement[] _buttonElements;
+        private VisualElement[] _utilityElements;
         protected internal Action OnSelected;
 
         public CircleMenu(string path, GUIContent icon, Action onSelected, CircleMenu parent, int radius = 100,
@@ -29,28 +35,36 @@ namespace ContextCircleMenu.Editor
 
         internal ReadOnlySpan<VisualElement> CreateElements()
         {
-            var buttons = CreateButtons();
-            var utilityElements = CreateUtilityElements();
+            _buttonElements ??= CreateButtons();
+            _utilityElements ??= CreateUtilityElements();
 
-            for (var i = 0; i < buttons.Length; i++)
+            for (var i = 0; i < _buttonElements.Length; i++)
             {
-                var button = buttons[i];
+                var button = _buttonElements[i];
                 button.transform.position = Vector3.zero;
-                var to = Vector2.zero + GetPositionForIndex(i, buttons.Length);
+                var to = Vector2.zero + GetPositionForIndex(i, _buttonElements.Length);
                 button.experimental.animation.Position(to, 100);
             }
 
             var pool = ArrayPool<VisualElement>.Shared;
-            var buffer = pool.Rent(buttons.Length + utilityElements.Length);
-            buttons.CopyTo(buffer, 0);
-            utilityElements.CopyTo(buffer, buttons.Length);
-            var combinedSpan = new Span<VisualElement>(buffer, 0, buttons.Length + utilityElements.Length);
+            var buffer = pool.Rent(_buttonElements.Length + _utilityElements.Length);
+            _buttonElements.CopyTo(buffer, 0);
+            _utilityElements.CopyTo(buffer, _buttonElements.Length);
+            var combinedSpan = new Span<VisualElement>(buffer, 0, _buttonElements.Length + _utilityElements.Length);
             pool.Return(buffer);
             return combinedSpan;
         }
 
+        /// <summary>
+        ///     Creates the buttons for the menu.
+        /// </summary>
+        /// <returns></returns>
         protected abstract VisualElement[] CreateButtons();
 
+        /// <summary>
+        ///     Creates the utility elements for the menu.
+        /// </summary>
+        /// <returns></returns>
         protected virtual VisualElement[] CreateUtilityElements()
         {
             return null;

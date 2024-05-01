@@ -4,6 +4,7 @@ using UnityEngine.UIElements;
 
 namespace ContextCircleMenu.Editor
 {
+    /// <inheritdoc />
     public class LeafCircleMenu : CircleMenu
     {
         public LeafCircleMenu(string path, GUIContent icon, Action onSelected, CircleMenu parent = null,
@@ -11,6 +12,7 @@ namespace ContextCircleMenu.Editor
         {
         }
 
+        /// <inheritdoc />
         protected override VisualElement[] CreateButtons()
         {
             return null;

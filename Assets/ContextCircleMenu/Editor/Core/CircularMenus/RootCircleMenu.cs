@@ -2,12 +2,14 @@ using UnityEngine.UIElements;
 
 namespace ContextCircleMenu.Editor
 {
+    /// <inheritdoc />
     public class RootCircleMenu : CircleMenu
     {
         public RootCircleMenu() : base("root", default, null, null)
         {
         }
 
+        /// <inheritdoc />
         protected override VisualElement[] CreateButtons()
         {
             var buttons = new VisualElement[Children.Count];
@@ -26,6 +28,7 @@ namespace ContextCircleMenu.Editor
             return buttons;
         }
 
+        /// <inheritdoc />
         protected override VisualElement[] CreateUtilityElements()
         {
             return new VisualElement[] { new Label("") };

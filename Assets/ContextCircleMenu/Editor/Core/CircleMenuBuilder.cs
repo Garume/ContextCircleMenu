@@ -40,21 +40,40 @@ namespace ContextCircleMenu.Editor
             return root;
         }
 
-        public void AddMenu(string attributePath, ContextCircleMenuAttribute attribute, MethodInfo method)
+        /// <summary>
+        ///     Adds a menu from attribute.
+        /// </summary>
+        /// <param name="attribute"></param>
+        /// <param name="method"></param>
+        public void AddMenu(ContextCircleMenuAttribute attribute, MethodInfo method)
         {
-            AddMenu(new AttributeCircleMenuFactory(attributePath, attribute, method));
+            AddMenu(new AttributeCircleMenuFactory(attribute, method));
         }
 
+        /// <summary>
+        ///     Adds a menu manually.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="content"></param>
+        /// <param name="action"></param>
         public void AddMenu(string path, GUIContent content, Action action)
         {
             AddMenu(new CircleMenuFactory(path, content, action));
         }
 
+        /// <summary>
+        ///     Adds a factory to the list of menu item factories.
+        /// </summary>
+        /// <param name="factory">The factory responsible for creating the menu item.</param>
         public void AddMenu(ICircleMenuFactory factory)
         {
             _factories.Add(factory);
         }
 
+        /// <summary>
+        ///     Sets a custom factory for creating folder-like menu items, allowing for further customization of menu folders.
+        /// </summary>
+        /// <param name="factory">The factory to use for creating folder menu items.</param>
         public void ConfigureFolder(IFolderCircleMenuFactory factory)
         {
             _folderFactory = factory;
