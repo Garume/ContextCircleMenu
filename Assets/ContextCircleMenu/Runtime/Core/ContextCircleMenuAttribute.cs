@@ -3,7 +3,7 @@ using System;
 namespace ContextCircleMenu
 {
     [AttributeUsage(AttributeTargets.Method)]
-    public class ContextCircleMenuAttribute : Attribute
+    public sealed class ContextCircleMenuAttribute : Attribute
     {
         public readonly string IconPath;
         public readonly string Path;
