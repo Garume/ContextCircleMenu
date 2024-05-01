@@ -1,12 +1,8 @@
 {
-    "name": "ContextCircleMenu.Editor",
-    "rootNamespace": "",
-    "references": [
-        "GUID:976b98c4db6ffd04d9cdc43fa24bfbe8"
-    ],
-    "includePlatforms": [
-        "Editor"
-    ],
+    "name": "ContextCircleMenu",
+    "rootNamespace": "ContextCircleMenu",
+    "references": [],
+    "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
