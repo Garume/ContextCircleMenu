@@ -67,6 +67,9 @@ namespace ContextCircleMenu.Editor
             _activeSceneView.rootVisualElement.Add(_contextCircleMenu);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public static event Action<CircleMenuBuilder> OnBuild
         {
             add => _onBuild += value;
