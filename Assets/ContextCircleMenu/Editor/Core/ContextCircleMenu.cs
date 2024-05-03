@@ -10,6 +10,7 @@ namespace ContextCircleMenu.Editor
     /// </summary>
     public class ContextCircleMenu : VisualElement, IMenuControllable
     {
+        private const float IndicatorSizeDegrees = 70.0f;
         private static readonly Color AnnulusColor = new(0.02f, 0.02f, 0.02f, 0.8f);
         private static readonly Color MouseAngleIndicatorBackgroundColor = new(0.01f, 0.01f, 0.01f, 1.0f);
         private static readonly Color MouseAngleIndicatorForegroundColor = Color.white;
@@ -128,12 +129,10 @@ namespace ContextCircleMenu.Editor
             if (!IsVisible) return;
             var referenceVector = new Vector2(0f, -1f);
             var mouseVector = new Vector2(
-                evt.mousePosition.x - _position.x,
-                -evt.mousePosition.y + _position.y).normalized;
-            var angle = (float)(Math.Atan2(referenceVector.y, referenceVector.x) -
-                                Math.Atan2(mouseVector.y, mouseVector.x)) * (float)(180 / Math.PI);
-            if (angle < 0) angle += 360.0f;
-            _currentMouseAngle = angle;
+                _mousePosition.x - _position.x,
+                -_mousePosition.y + _position.y).normalized;
+            _currentMouseAngle = Vector2.SignedAngle(mouseVector, referenceVector);
+
             MarkDirtyRepaint();
         }
 
@@ -163,34 +162,17 @@ namespace ContextCircleMenu.Editor
         {
             var position = new Vector2(_width * 0.5f, _height * 0.5f);
             var radius = _width * 0.1f;
-            const float indicatorSizeDegrees = 70.0f;
+
+            var startAngle = _currentMouseAngle + 90.0f - IndicatorSizeDegrees * 0.5f;
+            var endAngle = _currentMouseAngle + 90.0f + IndicatorSizeDegrees * 0.5f;
 
             var painter = context.painter2D;
             painter.lineCap = LineCap.Butt;
 
-            painter.lineWidth = 8.0f;
-            painter.strokeColor = AnnulusColor;
-            painter.BeginPath();
-            painter.Arc(new Vector2(position.x, position.y), radius, 0.0f, 360.0f);
-            painter.Stroke();
-
-            painter.lineWidth = 8.0f;
-            painter.strokeColor = MouseAngleIndicatorBackgroundColor;
-            painter.BeginPath();
-            painter.Arc(new Vector2(position.x, position.y), radius,
-                _currentMouseAngle + 90.0f - indicatorSizeDegrees * 0.5f,
-                _currentMouseAngle + 90.0f + indicatorSizeDegrees * 0.5f);
-            painter.Stroke();
-
-            painter.lineWidth = 4.0f;
-            painter.strokeColor = MouseAngleIndicatorForegroundColor;
-            painter.BeginPath();
-            painter.Arc(new Vector2(position.x, position.y), radius,
-                _currentMouseAngle + 90.0f - indicatorSizeDegrees * 0.5f,
-                _currentMouseAngle + 90.0f + indicatorSizeDegrees * 0.5f);
-            painter.Stroke();
+            painter.DrawCircle(position, radius, 0f, 360.0f, 8.0f, AnnulusColor);
+            painter.DrawCircle(position, radius, startAngle, endAngle, 8.0f, MouseAngleIndicatorBackgroundColor);
+            painter.DrawCircle(position, radius, startAngle, endAngle, 4.0f, MouseAngleIndicatorForegroundColor);
         }
-
 
         /// <summary>
         ///     Configures and builds the menu based on a provided configuration action.
