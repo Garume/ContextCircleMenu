@@ -12,30 +12,34 @@ namespace ContextCircleMenu.Editor
     public abstract class CircleMenu
     {
         private readonly int _radius;
-        protected internal readonly List<CircleMenu> Children = new();
+        protected internal readonly List<CircleMenu> Children = new(8);
         protected internal readonly GUIContent Icon;
         protected internal readonly CircleMenu Parent;
         protected internal readonly string Path;
         protected internal readonly bool ShouldCloseMenuAfterSelection;
-
         private VisualElement[] _buttonElements;
+
+        private IButtonFactory _buttonFactory;
         private VisualElement[] _utilityElements;
         protected internal Action OnSelected;
 
-        public CircleMenu(string path, GUIContent icon, Action onSelected, CircleMenu parent, int radius = 100,
+        public CircleMenu(string path, GUIContent icon, Action onSelected, CircleMenu parent, IButtonFactory factory,
+            int radius = 100,
             bool shouldCloseMenuAfterSelection = true)
         {
             Path = path;
             Icon = icon;
             OnSelected = onSelected;
             Parent = parent;
+            _buttonFactory = factory;
             _radius = radius;
             ShouldCloseMenuAfterSelection = shouldCloseMenuAfterSelection;
         }
 
         internal ReadOnlySpan<VisualElement> CreateElements()
         {
-            _buttonElements ??= CreateButtons();
+            _buttonFactory ??= new ButtonFactory();
+            _buttonElements ??= CreateButtons(_buttonFactory);
             _utilityElements ??= CreateUtilityElements();
 
             for (var i = 0; i < _buttonElements.Length; i++)
@@ -59,7 +63,7 @@ namespace ContextCircleMenu.Editor
         ///     Creates the buttons for the menu.
         /// </summary>
         /// <returns></returns>
-        protected abstract VisualElement[] CreateButtons();
+        protected abstract VisualElement[] CreateButtons(IButtonFactory factory);
 
         /// <summary>
         ///     Creates the utility elements for the menu.
