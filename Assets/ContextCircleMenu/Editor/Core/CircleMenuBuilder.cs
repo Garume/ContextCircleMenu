@@ -9,6 +9,7 @@ namespace ContextCircleMenu.Editor
     public sealed class CircleMenuBuilder
     {
         private readonly List<ICircleMenuFactory> _factories = new();
+        private IButtonFactory _buttonFactory;
         private IFolderCircleMenuFactory _folderFactory;
         private ICircleMenuFactory _rootFactory;
 
@@ -16,8 +17,9 @@ namespace ContextCircleMenu.Editor
         {
             _rootFactory ??= new RootMenuFactory();
             _folderFactory ??= new FolderMenuFactory();
+            _buttonFactory ??= new ButtonFactory();
 
-            var root = _rootFactory.Create();
+            var root = _rootFactory.Create(_buttonFactory);
             foreach (var factory in _factories)
             {
                 var pathSegments = factory.PathSegments.SkipLast(1);
@@ -27,14 +29,14 @@ namespace ContextCircleMenu.Editor
                     var child = currentMenu.Children.Find(m => m.Path == pathSegment);
                     if (child == null)
                     {
-                        child = _folderFactory.Create(pathSegment, menu, currentMenu);
+                        child = _folderFactory.Create(pathSegment, menu, currentMenu, _buttonFactory);
                         currentMenu.Children.Add(child);
                     }
 
                     currentMenu = child;
                 }
 
-                currentMenu.Children.Add(factory.Create());
+                currentMenu.Children.Add(factory.Create(_buttonFactory));
             }
 
             return root;
@@ -77,6 +79,15 @@ namespace ContextCircleMenu.Editor
         public void ConfigureFolder(IFolderCircleMenuFactory factory)
         {
             _folderFactory = factory;
+        }
+
+        /// <summary>
+        ///     Sets a custom factory for creating menu buttons, allowing for further customization of menu buttons.
+        /// </summary>
+        /// <param name="factory">The factory to use for creating menu buttons.</param>
+        public void ConfigureButton(IButtonFactory factory)
+        {
+            _buttonFactory = factory;
         }
     }
 }

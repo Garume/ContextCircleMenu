@@ -147,7 +147,7 @@ namespace ContextCircleMenu.Editor
         /// </summary>
         public bool TryForceSelect()
         {
-            var button = Children().OfType<CircularButton>().FirstOrDefault(b => b.IsEntered);
+            var button = Children().OfType<CircleButton>().FirstOrDefault(b => b.IsEntered);
             return button != null && button.TryForceSelect();
         }
 
