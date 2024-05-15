@@ -5,11 +5,11 @@ namespace ContextCircleMenu.Editor
     public interface ICircleMenuFactory
     {
         public IEnumerable<string> PathSegments { get; }
-        public CircleMenu Create();
+        public CircleMenu Create(IButtonFactory factory);
     }
 
     public interface IFolderCircleMenuFactory
     {
-        public CircleMenu Create(string path, IMenuControllable menu, CircleMenu parent);
+        public CircleMenu Create(string path, IMenuControllable menu, CircleMenu parent, IButtonFactory factory);
     }
 }

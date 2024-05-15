@@ -11,28 +11,29 @@ namespace ContextCircleMenu.Editor
         private readonly Action _onBack;
 
         public FolderCircleMenu(string path, Action<CircleMenu> onOpen, Action onBack, CircleMenu parent,
+            IButtonFactory factory,
             int radius = 100) :
             base(path, EditorGUIUtility.IconContent(EditorIcons.FolderIcon),
-                null, parent, radius, false)
+                null, parent, factory, radius, false)
         {
             OnSelected = () => onOpen(this);
             _onBack = onBack;
         }
 
         /// <inheritdoc />
-        protected override VisualElement[] CreateButtons()
+        protected override VisualElement[] CreateButtons(IButtonFactory factory)
         {
             var buttons = new VisualElement[Children.Count + 1];
-            buttons[0] = CircularButton.CreateBackButton(_onBack);
+            buttons[0] = factory.Create("Back", EditorGUIUtility.IconContent(EditorIcons.Back2x), _onBack, -1, false);
             for (var index = 1; index < buttons.Length; index++)
             {
                 var item = Children[index - 1];
                 buttons[index] =
-                    new CircularButton(
+                    factory.Create(
                         item.Children.Count > 0 ? item.Path + "" : item.Path,
                         item.Icon,
-                        Children.Count - index + 1,
                         item.OnSelected,
+                        Children.Count - index + 1,
                         item.ShouldCloseMenuAfterSelection);
             }
 
