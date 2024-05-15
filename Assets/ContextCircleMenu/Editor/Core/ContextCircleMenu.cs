@@ -111,15 +111,15 @@ namespace ContextCircleMenu.Editor
         private void OnAttach(AttachToPanelEvent evt)
         {
             generateVisualContent += OnGenerateVisualContent;
-            _target.RegisterCallback<MouseMoveEvent>(UpdateMousePosition);
-            _target.RegisterCallback<ClickEvent>(OnClick);
+            _target.RegisterCallback<MouseMoveEvent>(UpdateMousePosition, TrickleDown.TrickleDown);
+            _target.RegisterCallback<ClickEvent>(OnClick, TrickleDown.TrickleDown);
         }
 
         private void OnDetach(DetachFromPanelEvent evt)
         {
             generateVisualContent -= OnGenerateVisualContent;
-            _target.UnregisterCallback<MouseMoveEvent>(UpdateMousePosition);
-            _target.UnregisterCallback<ClickEvent>(OnClick);
+            _target.UnregisterCallback<MouseMoveEvent>(UpdateMousePosition, TrickleDown.TrickleDown);
+            _target.UnregisterCallback<ClickEvent>(OnClick, TrickleDown.TrickleDown);
         }
 
         private void UpdateMousePosition(MouseMoveEvent evt)
