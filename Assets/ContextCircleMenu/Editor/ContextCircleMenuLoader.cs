@@ -52,7 +52,7 @@ namespace ContextCircleMenu.Editor
         {
             if (_contextCircleMenu != null) RemovePreviousRadialMenu();
             _contextCircleMenu =
-                new ContextCircleMenu(RadialMenuSize.x, RadialMenuSize.y, _activeSceneView.rootVisualElement);
+                new ContextCircleMenu(RadialMenuSize.x, RadialMenuSize.y, 100f, _activeSceneView.rootVisualElement);
 
             if (_onBuild == null)
                 _contextCircleMenu.CreateMenu(builder =>
@@ -69,7 +69,7 @@ namespace ContextCircleMenu.Editor
 
             _activeSceneView.rootVisualElement.Add(_contextCircleMenu);
         }
-        
+
 
         /// <summary>
         ///     Event that allows customization of the Context Circle Menu construction.
