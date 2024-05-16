@@ -1,4 +1,5 @@
 using System;
+using UnityEditor;
 using UnityEngine;
 
 namespace ContextCircleMenu.Editor
@@ -9,6 +10,12 @@ namespace ContextCircleMenu.Editor
             bool shouldCloseMenuAfterSelection)
         {
             return new SimpleCircleButton(path, icon, section, onSelected, shouldCloseMenuAfterSelection);
+        }
+
+        public CircleButton CreateBackButton(Action onBack)
+        {
+            return new SimpleCircleButton("Back", EditorGUIUtility.IconContent(EditorIcons.Back2x),
+                -1, onBack, false);
         }
     }
 }

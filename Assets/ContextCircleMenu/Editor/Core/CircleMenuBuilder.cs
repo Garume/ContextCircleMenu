@@ -11,15 +11,13 @@ namespace ContextCircleMenu.Editor
         private readonly List<ICircleMenuFactory> _factories = new();
         private IButtonFactory _buttonFactory;
         private IFolderCircleMenuFactory _folderFactory;
-        private ICircleMenuFactory _rootFactory;
 
         internal CircleMenu Build(IMenuControllable menu)
         {
-            _rootFactory ??= new RootMenuFactory();
             _folderFactory ??= new FolderMenuFactory();
             _buttonFactory ??= new ButtonFactory();
 
-            var root = _rootFactory.Create(_buttonFactory);
+            CircleMenu root = _folderFactory.Create(string.Empty, menu, null, _buttonFactory);
             foreach (var factory in _factories)
             {
                 var pathSegments = factory.PathSegments.SkipLast(1);
@@ -30,6 +28,8 @@ namespace ContextCircleMenu.Editor
                     if (child == null)
                     {
                         child = _folderFactory.Create(pathSegment, menu, currentMenu, _buttonFactory);
+                        var backButton = _buttonFactory.CreateBackButton(menu.Back);
+                        child.PrepareButton(backButton);
                         currentMenu.Children.Add(child);
                     }
 

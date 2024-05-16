@@ -7,5 +7,7 @@ namespace ContextCircleMenu.Editor
     {
         public CircleButton Create(string path, GUIContent icon, Action onSelected, int section,
             bool shouldCloseMenuAfterSelection);
+
+        public CircleButton CreateBackButton(Action onBack);
     }
 }

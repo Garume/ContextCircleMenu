@@ -10,6 +10,6 @@ namespace ContextCircleMenu.Editor
 
     public interface IFolderCircleMenuFactory
     {
-        public CircleMenu Create(string path, IMenuControllable menu, CircleMenu parent, IButtonFactory factory);
+        public FolderCircleMenu Create(string path, IMenuControllable menu, CircleMenu parent, IButtonFactory factory);
     }
 }

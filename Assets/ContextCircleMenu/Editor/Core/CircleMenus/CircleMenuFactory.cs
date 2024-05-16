@@ -50,23 +50,11 @@ namespace ContextCircleMenu.Editor
         }
     }
 
-    public class RootMenuFactory : ICircleMenuFactory
-    {
-        public IEnumerable<string> PathSegments => null;
-
-        public CircleMenu Create(IButtonFactory factory)
-        {
-            return new RootCircleMenu(factory);
-        }
-    }
-
     public class FolderMenuFactory : IFolderCircleMenuFactory
     {
-        public int Radius { get; set; } = 100;
-
-        public CircleMenu Create(string path, IMenuControllable menu, CircleMenu parent, IButtonFactory factory)
+        public FolderCircleMenu Create(string path, IMenuControllable menu, CircleMenu parent, IButtonFactory factory)
         {
-            return new FolderCircleMenu(path, menu.Open, menu.Back, parent, factory, Radius);
+            return new FolderCircleMenu(path, menu, parent, factory);
         }
     }
 }

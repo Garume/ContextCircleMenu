@@ -1,4 +1,3 @@
-using System;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -8,46 +7,48 @@ namespace ContextCircleMenu.Editor
     /// <inheritdoc />
     public class FolderCircleMenu : CircleMenu
     {
-        private readonly Action _onBack;
-
-        public FolderCircleMenu(string path, Action<CircleMenu> onOpen, Action onBack, CircleMenu parent,
+        public FolderCircleMenu(string path, IMenuControllable menu,
+            GUIContent icon,
+            CircleMenu parent,
             IButtonFactory factory,
             int radius = 100) :
-            base(path, EditorGUIUtility.IconContent(EditorIcons.FolderIcon),
+            base(path, icon,
                 null, parent, factory, radius, false)
         {
-            OnSelected = () => onOpen(this);
-            _onBack = onBack;
+            OnSelected = () => menu.Open(this);
+        }
+
+        internal FolderCircleMenu(string path, IMenuControllable menu,
+            CircleMenu parent,
+            IButtonFactory factory,
+            int radius = 100) :
+            this(path, menu, EditorGUIUtility.IconContent(EditorIcons.FolderIcon), parent, factory, radius)
+        {
         }
 
         /// <inheritdoc />
-        protected override VisualElement[] CreateButtons(IButtonFactory factory)
+        protected override VisualElement[] CreateButtons(IButtonFactory factory, ref ContextCircleMenuOption menuOption)
         {
-            var buttons = new VisualElement[Children.Count + 1];
-            buttons[0] = factory.Create("Back", EditorGUIUtility.IconContent(EditorIcons.Back2x), _onBack, -1, false);
-            for (var index = 1; index < buttons.Length; index++)
+            var buttons = new VisualElement[Children.Count];
+            for (var index = 0; index < buttons.Length; index++)
             {
-                var item = Children[index - 1];
-                buttons[index] =
-                    factory.Create(
-                        item.Children.Count > 0 ? item.Path + "" : item.Path,
-                        item.Icon,
-                        item.OnSelected,
-                        Children.Count - index + 1,
-                        item.ShouldCloseMenuAfterSelection);
+                var item = Children[index];
+                buttons[index] = factory.Create(item.Path, item.Icon, item.OnSelected,
+                    Children.Count - index,
+                    item.ShouldCloseMenuAfterSelection);
             }
 
             return buttons;
         }
 
         /// <inheritdoc />
-        protected override VisualElement[] CreateUtilityElements()
+        protected override VisualElement[] CreateUtilityElements(ref ContextCircleMenuOption menuOption)
         {
             var label = new Label(Path)
             {
                 style =
                 {
-                    marginBottom = 100f * 0.5f + 5.0f,
+                    marginBottom = menuOption.Height * 0.5f + 5.0f,
                     fontSize = 10,
                     unityTextAlign = TextAnchor.MiddleCenter,
                     color = Color.white,
