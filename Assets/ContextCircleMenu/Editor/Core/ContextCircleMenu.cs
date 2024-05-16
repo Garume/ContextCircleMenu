@@ -157,11 +157,11 @@ namespace ContextCircleMenu.Editor
 
             var currentAngle = _currentMouseAngle % 360;
             if (currentAngle < 0) currentAngle += 360;
-            
+
             var region = (int)(currentAngle / anglePerRegion);
             if (region <= 0) region = Children().Count() - 1;
 
-            var otherButtons = Children().OfType<CircularButton>().Where(x => x.Section != region);
+            var otherButtons = Children().OfType<CircleButton>().Where(x => x.Section != region);
             foreach (var otherButton in otherButtons)
             {
                 var mouseLeaveEvent = MouseLeaveEvent.GetPooled();
@@ -169,7 +169,7 @@ namespace ContextCircleMenu.Editor
                 otherButton.SendEvent(mouseLeaveEvent);
             }
 
-            var button = Children().OfType<CircularButton>().FirstOrDefault(x => x.Section == region);
+            var button = Children().OfType<CircleButton>().FirstOrDefault(x => x.Section == region);
             if (button == null) return true;
             var mouseEnterEvent = MouseEnterEvent.GetPooled();
             mouseEnterEvent.target = button;
