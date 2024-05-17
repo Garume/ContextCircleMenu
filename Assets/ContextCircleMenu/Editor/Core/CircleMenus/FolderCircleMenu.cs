@@ -66,6 +66,7 @@ namespace ContextCircleMenu.Editor
             return new VisualElement[] { label };
         }
 
+        /// <inheritdoc />
         protected override void OnInitialized(ref ContextCircleMenuOption menuOption)
         {
             var buttonCount = ButtonElements.Length;
@@ -74,6 +75,7 @@ namespace ContextCircleMenu.Editor
                 _buttonPositions[i] = GetPositionForIndex(i, buttonCount, menuOption.Radius);
         }
 
+        /// <inheritdoc />
         protected override void OnBuild()
         {
             for (var i = 0; i < ButtonElements.Length; i++)

@@ -92,10 +92,17 @@ namespace ContextCircleMenu.Editor
             return Array.Empty<VisualElement>();
         }
 
+        /// <summary>
+        ///     Called when the menu is initialized.
+        /// </summary>
+        /// <param name="menuOption"></param>
         protected virtual void OnInitialized(ref ContextCircleMenuOption menuOption)
         {
         }
 
+        /// <summary>
+        ///     Called when the menu is built.
+        /// </summary>
         protected virtual void OnBuild()
         {
         }
