@@ -8,17 +8,20 @@ namespace ContextCircleMenu.Editor
     {
         private readonly Action _onSelect;
         private Button _button;
-        public bool IsEntered;
 
         protected CircleButton(string text, GUIContent icon, int section, Action onSelect)
         {
             _onSelect = onSelect;
+
+            Section = section;
 
             Initialize(text, icon, section);
         }
 
         internal bool ShouldCloseMenuAfterSelection { get; set; } = true;
 
+        public bool IsEntered { get; private set; }
+        public int Section { get; private set; }
         private void Initialize(string text, GUIContent icon, int section)
         {
             style.position = Position.Absolute;
