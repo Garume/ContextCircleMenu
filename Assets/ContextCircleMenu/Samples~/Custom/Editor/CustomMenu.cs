@@ -20,14 +20,20 @@ namespace ContextCircleMenu.Custom
                     () => Debug.Log("custom/test3"));
 
                 for (var i = 0; i < 5; i++)
+                {
+                    var i1 = i;
                     builder.AddMenu($"Custom/a/Debug Test {i}",
                         EditorGUIUtility.IconContent(EditorIcons.ConsoleInfoIcon2x),
-                        () => Debug.Log($"custom/test{i}"));
+                        () => Debug.Log($"custom/test{i1}"));
+                }
 
                 for (var i = 0; i < 6; i++)
+                {
+                    var i1 = i;
                     builder.AddMenu($"Custom/b/Debug Test {i}",
                         EditorGUIUtility.IconContent(EditorIcons.ConsoleInfoIcon2x),
-                        () => Debug.Log($"custom/test{i}"));
+                        () => Debug.Log($"custom/test{i1}"));
+                }
 
                 builder.AddMenu("Debug Test", new GUIContent(), () => Debug.Log("test"));
                 builder.AddMenu("Debug Test 2", EditorGUIUtility.IconContent(EditorIcons.ConsoleInfoIcon2x),
@@ -48,28 +54,9 @@ namespace ContextCircleMenu.Custom
 
     public class CustomFolderCircleMenu : FolderCircleMenu
     {
-        public CustomFolderCircleMenu(string path, IMenuControllable menu, CircleMenu parent, IButtonFactory factory,
-            int radius = 100) : base(path, menu, EditorGUIUtility.IconContent(EditorIcons.FolderIcon), parent, factory,
-            radius)
+        public CustomFolderCircleMenu(string path, IMenuControllable menu, CircleMenu parent, IButtonFactory factory) :
+            base(path, menu, EditorGUIUtility.IconContent(EditorIcons.FolderIcon), parent, factory)
         {
-        }
-
-        protected override VisualElement[] CreateButtons(IButtonFactory factory, ref ContextCircleMenuOption menuOption)
-        {
-            var buttons = new VisualElement[Children.Count];
-            for (var index = 0; index < buttons.Length; index++)
-            {
-                var item = Children[index];
-                buttons[index] =
-                    factory.Create(
-                        item.Path,
-                        item.Icon,
-                        item.OnSelected,
-                        Children.Count - index,
-                        item.ShouldCloseMenuAfterSelection);
-            }
-
-            return buttons;
         }
 
         protected override VisualElement[] CreateUtilityElements(ref ContextCircleMenuOption menuOption)
@@ -79,14 +66,14 @@ namespace ContextCircleMenu.Custom
             element.generateVisualContent += context =>
             {
                 var painter = context.painter2D;
-
-                for (var i = 0; i < GetButtonCount(); i++)
+                var buttonCount = ButtonElements.Length;
+                for (var i = 0; i < buttonCount; i++)
                 {
-                    var angle = (float)i / GetButtonCount() * 360f;
-                    if (GetButtonCount() % 2 == 1)
+                    var angle = (float)i / buttonCount * 360f;
+                    if (buttonCount % 2 == 1)
                         angle += 180f;
                     else
-                        angle += 180f - 360f / GetButtonCount() / 2;
+                        angle += 180f - 360f / buttonCount / 2;
                     var vector = new Vector2(
                         Mathf.Sin(Mathf.Deg2Rad * angle),
                         Mathf.Cos(Mathf.Deg2Rad * angle)).normalized;
@@ -114,23 +101,22 @@ namespace ContextCircleMenu.Custom
 
     public class CustomButtonFactory : IButtonFactory
     {
-        public CircleButton Create(string path, GUIContent icon, Action onSelected, int section,
-            bool shouldCloseMenuAfterSelection)
+        public CircleButton Create(string path, GUIContent icon, Action onSelected, int section)
         {
-            return new OnlyImageCircleButton(path, icon, section, onSelected, shouldCloseMenuAfterSelection);
+            return new OnlyImageCircleButton(path, icon, section, onSelected);
         }
 
         public CircleButton CreateBackButton(Action onBack)
         {
             return new OnlyImageCircleButton("Back", EditorGUIUtility.IconContent(EditorIcons.Back2x),
-                -1, onBack, false);
+                -1, onBack);
         }
     }
 
     public class OnlyImageCircleButton : CircleButton
     {
-        public OnlyImageCircleButton(string text, GUIContent icon, int section, Action onSelect,
-            bool shouldCloseMenuAfterSelect = true) : base(text, icon, section, onSelect, shouldCloseMenuAfterSelect)
+        public OnlyImageCircleButton(string text, GUIContent icon, int section, Action onSelect) : base(text, icon,
+            section, onSelect)
         {
         }
 
