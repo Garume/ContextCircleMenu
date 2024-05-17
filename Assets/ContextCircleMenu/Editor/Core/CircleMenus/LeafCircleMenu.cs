@@ -1,20 +1,18 @@
 using System;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace ContextCircleMenu.Editor
 {
     /// <inheritdoc />
-    public class LeafCircleMenu : CircleMenu
+    public sealed class LeafCircleMenu : CircleMenu
     {
         public LeafCircleMenu(string path, GUIContent icon, Action onSelected, IButtonFactory factory,
-            CircleMenu parent = null,
-            int radius = 100) : base(path, icon, onSelected, parent, factory, radius)
+            CircleMenu parent = null) : base(path, icon, onSelected, parent, factory)
         {
         }
 
         /// <inheritdoc />
-        protected override VisualElement[] CreateButtons(IButtonFactory factory)
+        protected override CircleButton[] CreateButtons(IButtonFactory factory, ref ContextCircleMenuOption menuOption)
         {
             return null;
         }
