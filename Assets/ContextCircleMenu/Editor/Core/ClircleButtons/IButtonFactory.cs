@@ -5,8 +5,7 @@ namespace ContextCircleMenu.Editor
 {
     public interface IButtonFactory
     {
-        public CircleButton Create(string path, GUIContent icon, Action onSelected, int section,
-            bool shouldCloseMenuAfterSelection);
+        public CircleButton Create(string path, GUIContent icon, Action onSelected, int section);
 
         public CircleButton CreateBackButton(Action onBack);
     }

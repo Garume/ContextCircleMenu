@@ -93,7 +93,6 @@ namespace ContextCircleMenu.Editor
         public void Open(CircleMenu menu)
         {
             if (!IsVisible) return;
-
             _selectedMenu = menu;
             Rebuild();
         }
@@ -105,7 +104,6 @@ namespace ContextCircleMenu.Editor
         {
             if (_selectedMenu.Parent != null) Open(_selectedMenu.Parent);
         }
-
 
         private void OnAttach(AttachToPanelEvent evt)
         {
@@ -153,7 +151,7 @@ namespace ContextCircleMenu.Editor
         private void Rebuild()
         {
             Clear();
-            var elements = _selectedMenu.CreateElements(ref _option);
+            var elements = _selectedMenu.BuildElements(ref _option);
             for (var i = 0; i < elements.Length; i++) Add(elements[i]);
         }
 

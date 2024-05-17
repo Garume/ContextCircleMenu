@@ -12,28 +12,24 @@ namespace ContextCircleMenu.Editor
     /// </summary>
     public abstract class CircleMenu
     {
-        private readonly int _radius;
         protected internal readonly CircleMenu Parent;
 
         private bool _alreadyInitialized;
-
-        private VisualElement[] _buttonElements;
         private IButtonFactory _buttonFactory;
-        private Vector3[] _buttonPositions;
         private VisualElement _preparedElement;
-        private VisualElement[] _utilityElements;
+
+        protected CircleButton[] ButtonElements;
+        protected VisualElement[] UtilityElements;
 
         protected CircleMenu(string path, GUIContent icon, Action onSelected, CircleMenu parent, IButtonFactory factory,
-            int radius = 100,
             bool shouldCloseMenuAfterSelection = true)
         {
             Path = path;
             Icon = icon;
             OnSelected = onSelected;
             Parent = parent;
-            _buttonFactory = factory;
-            _radius = radius;
             ShouldCloseMenuAfterSelection = shouldCloseMenuAfterSelection;
+            _buttonFactory = factory;
         }
 
         public List<CircleMenu> Children { get; } = new(8);
@@ -42,65 +38,49 @@ namespace ContextCircleMenu.Editor
         public bool ShouldCloseMenuAfterSelection { get; }
         public Action OnSelected { get; protected set; }
 
-        internal ReadOnlySpan<VisualElement> CreateElements(ref ContextCircleMenuOption menuOption)
+        internal ReadOnlySpan<VisualElement> BuildElements(ref ContextCircleMenuOption menuOption)
         {
             if (!_alreadyInitialized)
             {
                 _buttonFactory ??= new ButtonFactory();
                 var buttons = CreateButtons(_buttonFactory, ref menuOption);
-                _buttonElements = _buttonElements == null ? buttons : _buttonElements.Concat(buttons).ToArray();
-                _utilityElements ??= CreateUtilityElements(ref menuOption);
+                ButtonElements = ButtonElements == null ? buttons : ButtonElements.Concat(buttons).ToArray();
+                UtilityElements = CreateUtilityElements(ref menuOption);
 
-                _buttonPositions = new Vector3[_buttonElements.Length];
-                for (var i = 0; i < _buttonElements.Length; i++)
-                    _buttonPositions[i] = GetPositionForIndex(i, _buttonElements.Length);
+                OnInitialized(ref menuOption);
                 _alreadyInitialized = true;
             }
 
-            for (var i = 0; i < _buttonElements.Length; i++)
-            {
-                var button = _buttonElements[i];
-                button.transform.position = Vector3.zero;
-                var to = _buttonPositions[i];
-                button.experimental.animation.Position(to, 100);
-            }
+            OnBuild();
 
             var pool = ArrayPool<VisualElement>.Shared;
-            var buffer = pool.Rent(_buttonElements.Length + _utilityElements.Length);
-            _buttonElements.CopyTo(buffer, 0);
-            _utilityElements.CopyTo(buffer, _buttonElements.Length);
-            var combinedSpan = new Span<VisualElement>(buffer, 0, _buttonElements.Length + _utilityElements.Length);
+            var buffer = pool.Rent(ButtonElements.Length + UtilityElements.Length);
+            ButtonElements.CopyTo(buffer, 0);
+            UtilityElements.CopyTo(buffer, ButtonElements.Length);
+            var combinedSpan = new Span<VisualElement>(buffer, 0, ButtonElements.Length + UtilityElements.Length);
             pool.Return(buffer);
             return combinedSpan;
         }
 
+
         internal void PrepareButton(CircleButton button)
         {
-            if (_buttonElements == null)
+            if (ButtonElements == null)
             {
-                _buttonElements = new VisualElement[] { button };
+                ButtonElements = new[] { button };
             }
             else
             {
-                Array.Resize(ref _buttonElements, _buttonElements.Length + 1);
-                _buttonElements[^1] = button;
+                Array.Resize(ref ButtonElements, ButtonElements.Length + 1);
+                ButtonElements[^1] = button;
             }
-        }
-
-        /// <summary>
-        ///     Gets the number of buttons in the menu.
-        /// </summary>
-        /// <returns></returns>
-        public int GetButtonCount()
-        {
-            return _buttonElements.Length;
         }
 
         /// <summary>
         ///     Creates the buttons for the menu.
         /// </summary>
         /// <returns></returns>
-        protected abstract VisualElement[]
+        protected abstract CircleButton[]
             CreateButtons(IButtonFactory factory, ref ContextCircleMenuOption menuOption);
 
         /// <summary>
@@ -112,13 +92,12 @@ namespace ContextCircleMenu.Editor
             return Array.Empty<VisualElement>();
         }
 
-        private Vector3 GetPositionForIndex(float index, float totalCount)
+        protected virtual void OnInitialized(ref ContextCircleMenuOption menuOption)
         {
-            var angle = index / totalCount * 360f;
-            return new Vector2(
-                Mathf.Sin(angle * Mathf.Deg2Rad) * _radius,
-                Mathf.Cos(angle * Mathf.Deg2Rad) * _radius
-            );
+        }
+
+        protected virtual void OnBuild()
+        {
         }
     }
 }

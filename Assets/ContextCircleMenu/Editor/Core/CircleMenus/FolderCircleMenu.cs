@@ -7,35 +7,38 @@ namespace ContextCircleMenu.Editor
     /// <inheritdoc />
     public class FolderCircleMenu : CircleMenu
     {
+        private Vector3[] _buttonPositions;
+
         public FolderCircleMenu(string path, IMenuControllable menu,
             GUIContent icon,
             CircleMenu parent,
-            IButtonFactory factory,
-            int radius = 100) :
-            base(path, icon,
-                null, parent, factory, radius, false)
+            IButtonFactory factory) :
+            base(path, icon, null, parent, factory, false)
         {
             OnSelected = () => menu.Open(this);
         }
 
         internal FolderCircleMenu(string path, IMenuControllable menu,
             CircleMenu parent,
-            IButtonFactory factory,
-            int radius = 100) :
-            this(path, menu, EditorGUIUtility.IconContent(EditorIcons.FolderIcon), parent, factory, radius)
+            IButtonFactory factory) :
+            this(path, menu, EditorGUIUtility.IconContent(EditorIcons.FolderIcon), parent, factory)
         {
         }
 
         /// <inheritdoc />
-        protected override VisualElement[] CreateButtons(IButtonFactory factory, ref ContextCircleMenuOption menuOption)
+        protected override CircleButton[] CreateButtons(IButtonFactory factory, ref ContextCircleMenuOption menuOption)
         {
-            var buttons = new VisualElement[Children.Count];
+            var buttons = new CircleButton[Children.Count];
             for (var index = 0; index < buttons.Length; index++)
             {
                 var item = Children[index];
-                buttons[index] = factory.Create(item.Path, item.Icon, item.OnSelected,
-                    Children.Count - index,
-                    item.ShouldCloseMenuAfterSelection);
+                var button = factory.Create(
+                    item.Path,
+                    item.Icon,
+                    item.OnSelected,
+                    Children.Count - index);
+                button.ShouldCloseMenuAfterSelection = item.ShouldCloseMenuAfterSelection;
+                buttons[index] = button;
             }
 
             return buttons;
@@ -61,6 +64,34 @@ namespace ContextCircleMenu.Editor
                 }
             };
             return new VisualElement[] { label };
+        }
+
+        protected override void OnInitialized(ref ContextCircleMenuOption menuOption)
+        {
+            var buttonCount = ButtonElements.Length;
+            _buttonPositions = new Vector3[buttonCount];
+            for (var i = 0; i < buttonCount; i++)
+                _buttonPositions[i] = GetPositionForIndex(i, buttonCount, menuOption.Radius);
+        }
+
+        protected override void OnBuild()
+        {
+            for (var i = 0; i < ButtonElements.Length; i++)
+            {
+                var button = ButtonElements[i];
+                button.transform.position = Vector3.zero;
+                var to = _buttonPositions[i];
+                button.experimental.animation.Position(to, 100);
+            }
+        }
+
+        private Vector3 GetPositionForIndex(float index, float totalCount, float radius)
+        {
+            var angle = index / totalCount * 360f;
+            return new Vector2(
+                Mathf.Sin(angle * Mathf.Deg2Rad) * radius,
+                Mathf.Cos(angle * Mathf.Deg2Rad) * radius
+            );
         }
     }
 }

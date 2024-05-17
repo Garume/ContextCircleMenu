@@ -29,6 +29,7 @@ namespace ContextCircleMenu.Editor
                     {
                         child = _folderFactory.Create(pathSegment, menu, currentMenu, _buttonFactory);
                         var backButton = _buttonFactory.CreateBackButton(menu.Back);
+                        backButton.ShouldCloseMenuAfterSelection = false;
                         child.PrepareButton(backButton);
                         currentMenu.Children.Add(child);
                     }

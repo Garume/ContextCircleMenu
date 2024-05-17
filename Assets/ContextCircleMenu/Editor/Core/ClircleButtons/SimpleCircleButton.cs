@@ -9,8 +9,8 @@ namespace ContextCircleMenu.Editor
         private readonly Color _hoverColor = new(0.2745098f, 0.3764706f, 0.4862745f, 1.0f);
         private readonly Color _normalColor = new(0.02f, 0.02f, 0.02f, 0.8f);
 
-        public SimpleCircleButton(string text, GUIContent icon, int section, Action onSelect,
-            bool shouldCloseMenuAfterSelect = true) : base(text, icon, section, onSelect, shouldCloseMenuAfterSelect)
+        public SimpleCircleButton(string text, GUIContent icon, int section, Action onSelect) 
+            : base(text, icon, section, onSelect)
         {
         }
 

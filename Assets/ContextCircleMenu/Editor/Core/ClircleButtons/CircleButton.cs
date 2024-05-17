@@ -7,18 +7,17 @@ namespace ContextCircleMenu.Editor
     public abstract class CircleButton : VisualElement
     {
         private readonly Action _onSelect;
-        private readonly bool _shouldCloseMenuAfterSelect;
         private Button _button;
         public bool IsEntered;
 
-        protected CircleButton(string text, GUIContent icon, int section, Action onSelect,
-            bool shouldCloseMenuAfterSelect)
+        protected CircleButton(string text, GUIContent icon, int section, Action onSelect)
         {
             _onSelect = onSelect;
-            _shouldCloseMenuAfterSelect = shouldCloseMenuAfterSelect;
 
             Initialize(text, icon, section);
         }
+
+        internal bool ShouldCloseMenuAfterSelection { get; set; } = true;
 
         private void Initialize(string text, GUIContent icon, int section)
         {
@@ -38,7 +37,7 @@ namespace ContextCircleMenu.Editor
         internal bool TryForceSelect()
         {
             _onSelect?.Invoke();
-            return _shouldCloseMenuAfterSelect;
+            return ShouldCloseMenuAfterSelection;
         }
 
         private void InternalOnMouseEnter(MouseEnterEvent evt)
