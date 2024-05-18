@@ -330,7 +330,7 @@ ContextCircleMenuLoader.OnBuild += (builder =>
 
 Then it will be replaced by the following UI.
 
-! [alt text](docs/image-5.png)
+![alt text](docs/image-5.png)
 
 ### Customized Shortcut Key
 
