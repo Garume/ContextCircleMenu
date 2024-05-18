@@ -16,7 +16,6 @@ namespace ContextCircleMenu.Editor
 
         private bool _alreadyInitialized;
         private IButtonFactory _buttonFactory;
-        private VisualElement _preparedElement;
 
         protected CircleButton[] ButtonElements;
         protected VisualElement[] UtilityElements;
