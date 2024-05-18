@@ -20,40 +20,31 @@ Context Circle Menu is a simple open-source tool for Unity. It lets users open a
 ### Feature
 
 -   Create Context Circle Menu
-
-![alt text](docs/image.png)
-
 -   Easy to use Editor Icon
-
 -   Customized Menu
-
     -   Add from Attribute
-
-    ![alt text](docs/image-1.png)
-
     -   Add Manual
-
-    ![alt text](docs/image-2.png)
-
+    -   Button design
+    -   Folder design
 -   Open in Scene View
 -   Customized Shortcut Key
 
-![alt text](docs/image-3.png)
-
 ## Table of Contents
 - [Context Circle Menu](#context-circle-menu)
-  - [Overview](#overview)
-    - [Feature](#feature)
-  - [Table of Contents](#table-of-contents)
-  - [Setup](#setup)
-    - [Requirements](#requirements)
-    - [Installation](#installation)
-  - [Demonstration](#demonstration)
-  - [Editor Icons](#editor-icons)
-  - [Customized Menu](#customized-menu)
-    - [Manual Add Method](#manual-add-method)
-    - [Customized Button](#customized-button)
-  - [Customized Shortcut Key](#customized-shortcut-key)
+  - [Overview](#Overview)
+    - [Features](#Features)
+  - [Table of Contents](#Table-of-Contents)
+  - [Setup](#Setup)
+    - [Requirements](#Requirements)
+    - [Installation](#Installation)
+  - [Demonstration](#Demonstration)
+    - [Editor Icons](#editor-icons)
+    - [Add Manual Method](#Add-Manual-Method)
+  - [Customize](#Customize) 
+    - [Customize Buttons](#Customize-Buttons)
+    - [Customize Folder](#Customize-Folder)
+    - [Customize Shortcut](#Customized-Shortcut-Key)
+  - [API Documentation](#API-Documentation)
   - [LISENCE](#lisence)
   - [AUTHOR](#author)
 
@@ -121,7 +112,7 @@ Then you will see below menu.
 
 [![Image from Gyazo](https://i.gyazo.com/39b665e8fdd473bb408102e1b5d5bf09.gif)](https://gyazo.com/39b665e8fdd473bb408102e1b5d5bf09)
 
-## Editor Icons
+### Editor Icons
 
 Icons can be attached to menu buttons.
 
@@ -136,9 +127,6 @@ public static void TestMethod()
     Debug.Log("TestMethod");
 }
 ```
-
-## Customized Menu
-
 ### Manual Add Method
 
 If you do not want to use the `Context Circle Menu` attribute, you can register the method manually.
@@ -161,25 +149,94 @@ public class Menu
 }
 ```
 
+## Customization
+
 ### Customized Button
 
-If you don't like the button UI, you can replace it with your own.
+If you don't like the UI of the button, you can replace it with your own button.
 
-Use `builder.ConfigureFolder();`
+Use `builder.ConfigureButton` in `ContextCircleMenuLoader.OnBuild`.
 
-> [!CAUTION]
-> It is an incomplete feature.
-> 
-> Destructive changes may be made.
+```cs
+ContextCircleMenuLoader.OnBuild += (builder =>
+{
+    ...
+    builder.ConfigureButton(FolderMenuFactory);
+});
+```
 
-First, you need to create a FolderMenu that extends `CircleMenu`.
-You can create buttons freely in `CreateButtons`.
-Please refer to `FolderCircleMenu.cs` for detailed code.
+To create your own button, you must create a class that extends CircleButton and a corresponding Factory class.
 
-Next, create a FolderMenuFactory that implements `IFolderCircleMenuFactory`.
-Please refer to `CircleMenuFactory` for detailed code.
+Here is an example code similar to the one provided in Sample's Custom.
 
-Finally, you can replace the UI by doing the below.
+Samples can be imported from Package Manager > ContextCircleMenu > Samples.
+
+In this example, the button is replaced with a button that displays only an icon.
+
+Create the following class
+
+```cs
+public class CustomButtonFactory : IButtonFactory
+{
+    public CircleButton Create(string path, GUIContent icon, Action onSelected, int section)
+    {
+        return new OnlyImageCircleButton(path, icon, section, onSelected);
+    }
+
+    // Back button is needed when creating a folder structure menu.
+    // section should be -1 unless ConfigureFolder is used.
+    public CircleButton CreateBackButton(Action onBack)
+    {
+        return new OnlyImageCircleButton("Back", EditorGUIUtility.IconContent(EditorIcons.Back2x),
+            -1, onBack);
+    }
+}
+
+public class OnlyImageCircleButton : CircleButton
+{
+    public OnlyImageCircleButton(string text, GUIContent icon, int section, Action onSelect) : base(text, icon, section, onSelect)
+    {
+    }
+
+    // You can edit the generated buttons.
+    // Feel free to customize the buttons here.
+    protected override void ModifierButton(Button button, string text, GUIContent icon, int section)
+    {
+        var image = new Image
+        {
+            image = icon.image,
+            style =
+            {
+                width = 32f,
+                height = 32f,
+                flexShrink = 0
+            },
+            tooltip = text
+        };
+
+        button.Add(image);
+    }
+}
+
+```
+
+Set the created Factory class.
+
+```cs
+ContextCircleMenuLoader.OnBuild += (builder =>
+{
+    ...
+    builder.ConfigureButton(new CustomButtonFactory());
+});
+```
+
+It will then be replaced by a button that displays only the icon as shown below.
+
+![alt text](docs/image-6.png)
+
+### Customize Folder
+
+If you don't like the folder UI, you can replace it with your own folder.
 
 ```cs
 ContextCircleMenuLoader.OnBuild += (builder =>
@@ -189,7 +246,93 @@ ContextCircleMenuLoader.OnBuild += (builder =>
 });
 ```
 
-## Customized Shortcut Key
+> [!CAUTION]
+> Destructive changes were made in v1.0.0.
+
+To create your own folder, you need to create a class that extends FolderCircleMenu and a corresponding Factory class.
+
+
+Here is an example code similar to the one provided in Sample's Custom.
+
+Samples can be imported from Package Manager > ContextCircleMenu > Samples.
+
+In this example, we are replacing an existing UI with vector graphics.
+
+Create the following classes
+
+```cs
+public class CustomFolderMenuFactory : IFolderCircleMenuFactory
+{
+    public FolderCircleMenu Create(string path, IMenuControllable menu, CircleMenu parent, IButtonFactory factory)
+    {
+        return new CustomFolderCircleMenu(path, menu, parent, factory);
+    }
+}
+
+public class CustomFolderCircleMenu : FolderCircleMenu
+{
+    public CustomFolderCircleMenu(string path, IMenuControllable menu, CircleMenu parent, IButtonFactory factory) :
+        base(path, menu, EditorGUIUtility.IconContent(EditorIcons.FolderIcon), parent, factory)
+    {
+    }
+
+    protected override VisualElement[] CreateUtilityElements(ref ContextCircleMenuOption menuOption)
+    {
+        var element = new VisualElement();
+        var option = menuOption;
+        element.generateVisualContent += context =>
+        {
+            var painter = context.painter2D;
+            var buttonCount = ButtonElements.Length;
+            for (var i = 0; i < buttonCount; i++)
+            {
+                var angle = (float)i / buttonCount * 360f;
+                if (buttonCount % 2 == 1)
+                    angle += 180f;
+                else
+                    angle += 180f - 360f / buttonCount / 2;
+                var vector = new Vector2(
+                    Mathf.Sin(Mathf.Deg2Rad * angle),
+                    Mathf.Cos(Mathf.Deg2Rad * angle)).normalized;
+
+                var from = vector * 12f;
+                var to = vector * option.Radius * 1.5f;
+                painter.strokeColor = Color.black;
+                painter.lineWidth = 2f;
+                painter.BeginPath();
+                painter.MoveTo(from);
+                painter.LineTo(to);
+                painter.Stroke();
+            }
+
+            painter.BeginPath();
+            painter.Arc(Vector2.zero, option.Radius * 1.5f, 0, 360f);
+            painter.fillColor = new Color(0f, 0f, 0f, 0.2f);
+            painter.Fill();
+
+            painter.DrawCircle(Vector2.zero, option.Radius * 1.5f, 0, 360f, 5f, Color.gray);
+        };
+        return new[] { element };
+    }
+}
+```
+
+Set the created Factory class.
+
+```cs
+ContextCircleMenuLoader.OnBuild += (builder =>
+{
+    ...
+    builder.ConfigureButton(new CustomButtonFactory());
+    builder.ConfigureFolder(new CustomFolderMenuFactory());
+});
+```
+
+Then it will be replaced by the following UI.
+
+! [alt text](docs/image-5.png)
+
+### Customized Shortcut Key
 
 The default menu open/close button is set to the `A` key, but can be changed freely.
 
@@ -200,6 +343,63 @@ Search for `Context Circle Menu` and you will find the settings as shown in the 
 ![alt text](docs/image-3.png)
 
 Set the keys as you like.
+
+## API Documentation
+
+This section describes the major APIs and can be used as a reference when customizing the UI.
+
+### ContextCircleMenu
+
+#### property
+| property name | description |
+| ---- | ---- |
+| BlockMouseEvents | Disables mouse operations such as clicking if true. |
+
+#### method
+| method name | description |
+| ---- | ---- |
+| Show() | Show menu. |
+| Hide() | Hide menu. |
+| Open(CircleMenu menu) | Opens the menu specified in the argument. |
+| Back() | Open the previous menu. |
+| TryForceSelect() | If there is a button in focus, it is forced to select it. |
+| TryForceEnterByMousePosition() | Forces the button corresponding to the mouse position to focus. |
+| CreateMenu(Action\<CircleMenuBuilder\> configureMenu) | Create the menu content using CircleMenuBuilder. |
+
+### CircleMenuBuilder
+#### method
+| method name | description |
+| ---- | ---- |
+| AddMenu(ICircleMenuFactory factory) | Add your custom menu. |
+| AddMenu(string path, GUIContent content, Action action) | Add menus manually. |
+| AddMenu(ContextCircleMenuAttribute attribute, MethodInfo method) | Add a menu from the attributes. |
+| ConfigureFolder(IFolderCircleMenuFactory factory) | Replace with your custom folder menu. |
+| ConfigureButton(IButtonFactory factory) | Replace with your custom button. |
+
+### CircleMenu
+#### abstract method
+| method name | description |
+| ---- | ---- |
+| CreateButtons(IButtonFactory factory, ref ContextCircleMenuOption menuOption) | Create a button to be displayed on the menu. The IButtonFactory passed here will be the one set in CircleMenuBuilder.ConfigureButton(). |
+
+#### virtual method 
+| method name | description |
+| ---- | ---- |
+| CreateUtilityElements(ref ContextCircleMenuOption menuOption) | Create elements other than buttons. |
+| OnInitialized(ref ContextCircleMenuOption menuOption) | Called at initialization. |
+| OnBuild() | Called when an element is created. Mainly when Show() or Open() is called.  |
+
+### CircleButton
+#### abstract method
+| method name | description |
+| ---- | ---- |
+| ModifierButton(Button button, string text, GUIContent icon, int section) | Called when creating a button. Use it to modify the elements of the button. |
+
+#### virtual method 
+| method name | description |
+| ---- | ---- |
+| OnMouseEnter(Button button, MouseEnterEvent evt) | Called when the mouse enters an element.|
+| OnMouseLeave(Button button, MouseLeaveEvent evt) | Called when the mouse leaves an element. |
 
 ## LISENCE
 
