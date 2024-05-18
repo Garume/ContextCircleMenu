@@ -24,9 +24,9 @@ namespace ContextCircleMenu.Editor
 
         public IEnumerable<string> PathSegments { get; }
 
-        public CircleMenu Create()
+        public CircleMenu Create(IButtonFactory factory)
         {
-            return new LeafCircleMenu(PathSegments.Last(), _content, () => _method.Invoke(null, null));
+            return new LeafCircleMenu(PathSegments.Last(), _content, () => _method.Invoke(null, null), factory);
         }
     }
 
@@ -44,29 +44,17 @@ namespace ContextCircleMenu.Editor
 
         public IEnumerable<string> PathSegments { get; }
 
-        public CircleMenu Create()
+        public CircleMenu Create(IButtonFactory factory)
         {
-            return new LeafCircleMenu(PathSegments.Last(), _content, _action);
-        }
-    }
-
-    public class RootMenuFactory : ICircleMenuFactory
-    {
-        public IEnumerable<string> PathSegments => null;
-
-        public CircleMenu Create()
-        {
-            return new RootCircleMenu();
+            return new LeafCircleMenu(PathSegments.Last(), _content, _action, factory);
         }
     }
 
     public class FolderMenuFactory : IFolderCircleMenuFactory
     {
-        public int Radius { get; set; } = 100;
-
-        public CircleMenu Create(string path, IMenuControllable menu, CircleMenu parent)
+        public FolderCircleMenu Create(string path, IMenuControllable menu, CircleMenu parent, IButtonFactory factory)
         {
-            return new FolderCircleMenu(path, menu.Open, menu.Back, parent, Radius);
+            return new FolderCircleMenu(path, menu, parent, factory);
         }
     }
 }

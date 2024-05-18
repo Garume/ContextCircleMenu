@@ -14,12 +14,11 @@ namespace ContextCircleMenu.Editor
         private static readonly Color AnnulusColor = new(0.02f, 0.02f, 0.02f, 0.8f);
         private static readonly Color MouseAngleIndicatorBackgroundColor = new(0.01f, 0.01f, 0.01f, 1.0f);
         private static readonly Color MouseAngleIndicatorForegroundColor = Color.white;
-        private readonly float _height;
         private readonly VisualElement _target;
-        private readonly float _width;
 
         private float _currentMouseAngle;
         private Vector2 _mousePosition;
+        private ContextCircleMenuOption _option;
         private Vector2 _position;
 
         private CircleMenu _selectedMenu;
@@ -29,11 +28,11 @@ namespace ContextCircleMenu.Editor
         /// </summary>
         /// <param name="width">Width of the menu.</param>
         /// <param name="height">Height of the menu.</param>
+        /// <param name="radius">Radius of the menu. </param>
         /// <param name="target">The UI element in which the menu will appear.</param>
-        public ContextCircleMenu(float width, float height, VisualElement target)
+        public ContextCircleMenu(float width, float height, float radius, VisualElement target)
         {
-            _width = width;
-            _height = height;
+            _option = new ContextCircleMenuOption(radius, height, width);
             _target = target;
 
             style.position = Position.Absolute;
@@ -73,7 +72,7 @@ namespace ContextCircleMenu.Editor
 
             style.display = DisplayStyle.Flex;
             _position = _mousePosition;
-            transform.position = _position - new Vector2(_width * 0.5f, _height * 0.5f);
+            transform.position = _position - new Vector2(_option.Width * 0.5f, _option.Height * 0.5f);
             Rebuild();
         }
 
@@ -94,7 +93,6 @@ namespace ContextCircleMenu.Editor
         public void Open(CircleMenu menu)
         {
             if (!IsVisible) return;
-
             _selectedMenu = menu;
             Rebuild();
         }
@@ -107,19 +105,18 @@ namespace ContextCircleMenu.Editor
             if (_selectedMenu.Parent != null) Open(_selectedMenu.Parent);
         }
 
-
         private void OnAttach(AttachToPanelEvent evt)
         {
             generateVisualContent += OnGenerateVisualContent;
-            _target.RegisterCallback<MouseMoveEvent>(UpdateMousePosition);
-            _target.RegisterCallback<ClickEvent>(OnClick);
+            _target.RegisterCallback<MouseMoveEvent>(UpdateMousePosition, TrickleDown.TrickleDown);
+            _target.RegisterCallback<ClickEvent>(OnClick, TrickleDown.TrickleDown);
         }
 
         private void OnDetach(DetachFromPanelEvent evt)
         {
             generateVisualContent -= OnGenerateVisualContent;
-            _target.UnregisterCallback<MouseMoveEvent>(UpdateMousePosition);
-            _target.UnregisterCallback<ClickEvent>(OnClick);
+            _target.UnregisterCallback<MouseMoveEvent>(UpdateMousePosition, TrickleDown.TrickleDown);
+            _target.UnregisterCallback<ClickEvent>(OnClick, TrickleDown.TrickleDown);
         }
 
         private void UpdateMousePosition(MouseMoveEvent evt)
@@ -147,21 +144,47 @@ namespace ContextCircleMenu.Editor
         /// </summary>
         public bool TryForceSelect()
         {
-            var button = Children().OfType<CircularButton>().FirstOrDefault(b => b.IsEntered);
+            var button = Children().OfType<CircleButton>().FirstOrDefault(b => b.IsEntered);
             return button != null && button.TryForceSelect();
+        }
+
+        public bool TryForceEnterByMousePosition()
+        {
+            var anglePerRegion = 360f / (Children().Count() - 1);
+
+            var currentAngle = _currentMouseAngle % 360;
+            if (currentAngle < 0) currentAngle += 360;
+
+            var region = (int)(currentAngle / anglePerRegion);
+            if (region <= 0) region = Children().Count() - 1;
+
+            var otherButtons = Children().OfType<CircleButton>().Where(x => x.Section != region);
+            foreach (var otherButton in otherButtons)
+            {
+                var mouseLeaveEvent = MouseLeaveEvent.GetPooled();
+                mouseLeaveEvent.target = otherButton;
+                otherButton.SendEvent(mouseLeaveEvent);
+            }
+
+            var button = Children().OfType<CircleButton>().FirstOrDefault(x => x.Section == region);
+            if (button == null) return true;
+            var mouseEnterEvent = MouseEnterEvent.GetPooled();
+            mouseEnterEvent.target = button;
+            button.SendEvent(mouseEnterEvent);
+            return false;
         }
 
         private void Rebuild()
         {
             Clear();
-            var elements = _selectedMenu.CreateElements();
+            var elements = _selectedMenu.BuildElements(ref _option);
             for (var i = 0; i < elements.Length; i++) Add(elements[i]);
         }
 
         private void OnGenerateVisualContent(MeshGenerationContext context)
         {
-            var position = new Vector2(_width * 0.5f, _height * 0.5f);
-            var radius = _width * 0.1f;
+            var position = new Vector2(_option.Width * 0.5f, _option.Height * 0.5f);
+            var radius = _option.Width * 0.1f;
 
             var startAngle = _currentMouseAngle + 90.0f - IndicatorSizeDegrees * 0.5f;
             var endAngle = _currentMouseAngle + 90.0f + IndicatorSizeDegrees * 0.5f;
