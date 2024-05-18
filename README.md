@@ -370,8 +370,8 @@ This section describes the major APIs and can be used as a reference when custom
 #### method
 | method name | description |
 | ---- | ---- |
-| AddMenu(ICircleMenuFactory factory) | Add your custom menu. |
-| AddMenu(string path, GUIContent content, Action action) | Add menus manually. |
+| AddMenu(ICircleMenuFactory factory) | Add custom menu. |
+| AddMenu(string path, GUIContent content, Action action) | Add a menu manually. |
 | AddMenu(ContextCircleMenuAttribute attribute, MethodInfo method) | Add a menu from the attributes. |
 | ConfigureFolder(IFolderCircleMenuFactory factory) | Replace with your custom folder menu. |
 | ConfigureButton(IButtonFactory factory) | Replace with your custom button. |
