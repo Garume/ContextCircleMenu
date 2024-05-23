@@ -7,26 +7,51 @@ using UnityEngine;
 
 namespace ContextCircleMenu.Editor
 {
-    public class AttributeCircleMenuFactory : ICircleMenuFactory
+    public class CircleMenuFactory : ICircleMenuFactory
     {
-        private readonly GUIContent _content;
-        private readonly MethodInfo _method;
+        private readonly CircleMenuAction _circleMenuAction;
 
-        public AttributeCircleMenuFactory(ContextCircleMenuAttribute attribute, MethodInfo method)
+        public CircleMenuFactory(CircleMenuAction circleMenuAction)
         {
-            PathSegments = attribute.Path.Split("/");
-            _method = method;
-
-            _content = !string.IsNullOrEmpty(attribute.IconPath)
-                ? EditorGUIUtility.IconContent(attribute.IconPath)
-                : default;
+            PathSegments = circleMenuAction.Path.Split("/");
+            _circleMenuAction = circleMenuAction;
         }
 
         public IEnumerable<string> PathSegments { get; }
 
         public CircleMenu Create(IButtonFactory factory)
         {
-            return new LeafCircleMenu(PathSegments.Last(), _content, () => _method.Invoke(null, null), factory);
+            return new LeafCircleMenu(_circleMenuAction, factory);
+        }
+    }
+
+    public class AttributeCircleMenuFactory : ICircleMenuFactory
+    {
+        private readonly CircleMenuAction _circleMenuAction;
+
+        public AttributeCircleMenuFactory(ContextCircleMenuAttribute attribute, MethodInfo method)
+        {
+            PathSegments = attribute.Path.Split("/");
+
+            var icon = default(GUIContent);
+
+            if (!string.IsNullOrEmpty(attribute.IconPath))
+                icon = EditorGUIUtility.IconContent(attribute.IconPath);
+
+            _circleMenuAction =
+                new CircleMenuAction(attribute.Path,
+                    action =>
+                    {
+                        method.Invoke(null, method.GetParameters().Length == 0 ? null : new object[] { action });
+                    },
+                    icon);
+        }
+
+        public IEnumerable<string> PathSegments { get; }
+
+        public CircleMenu Create(IButtonFactory factory)
+        {
+            return new LeafCircleMenu(_circleMenuAction, factory);
         }
     }
 
@@ -42,11 +67,13 @@ namespace ContextCircleMenu.Editor
             _action = action;
         }
 
+
         public IEnumerable<string> PathSegments { get; }
 
         public CircleMenu Create(IButtonFactory factory)
         {
-            return new LeafCircleMenu(PathSegments.Last(), _content, _action, factory);
+            return new LeafCircleMenu(_circleMenuAction, factory);
+        }
         }
     }
 

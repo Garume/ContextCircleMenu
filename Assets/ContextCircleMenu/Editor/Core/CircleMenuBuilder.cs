@@ -24,11 +24,13 @@ namespace ContextCircleMenu.Editor
                 var currentMenu = root;
                 foreach (var pathSegment in pathSegments)
                 {
-                    var child = currentMenu.Children.Find(m => m.Path == pathSegment);
+                    var child = currentMenu.Children.Find(m => m.MenuAction.Path == pathSegment);
                     if (child == null)
                     {
                         child = _folderFactory.Create(pathSegment, menu, currentMenu, _buttonFactory);
-                        var backButton = _buttonFactory.CreateBackButton(menu.Back);
+                        var backMenuAction = new CircleMenuAction(pathSegment, _ => menu.Back(),
+                            _ => CircleMenuAction.Status.Normal, EditorGUIUtility.IconContent(EditorIcons.Back2x));
+                        var backButton = _buttonFactory.CreateBackButton(backMenuAction, -1);
                         backButton.ShouldCloseMenuAfterSelection = false;
                         child.PrepareButton(backButton);
                         currentMenu.Children.Add(child);
@@ -61,7 +63,17 @@ namespace ContextCircleMenu.Editor
         /// <param name="action"></param>
         public void AddMenu(string path, GUIContent content, Action action)
         {
-            AddMenu(new CircleMenuFactory(path, content, action));
+            var circleMenuAction = new CircleMenuAction(path, _ => action(), content);
+            AddMenu(new CircleMenuFactory(circleMenuAction));
+        }
+
+        public void AddMenu(string path, Action<CircleMenuEventInformation> action,
+            Func<CircleMenuEventInformation, CircleMenuAction.Status> statusCallback = null,
+            GUIContent content = null)
+        {
+            var circleMenuAction = new CircleMenuAction(path, action, statusCallback, content);
+            AddMenu(new CircleMenuFactory(circleMenuAction));
+        }
         }
 
         /// <summary>
