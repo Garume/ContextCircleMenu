@@ -2,7 +2,6 @@ using System;
 using System.Buffers;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace ContextCircleMenu.Editor
@@ -20,24 +19,21 @@ namespace ContextCircleMenu.Editor
         protected CircleButton[] ButtonElements;
         protected VisualElement[] UtilityElements;
 
-        protected CircleMenu(string path, GUIContent icon, Action onSelected, CircleMenu parent, IButtonFactory factory,
-            bool shouldCloseMenuAfterSelection = true)
+        protected CircleMenu(CircleMenuAction menuAction, IButtonFactory factory,
+            CircleMenu parent = null, bool shouldCloseMenuAfterSelection = true)
         {
-            Path = path;
-            Icon = icon;
-            OnSelected = onSelected;
+            MenuAction = menuAction;
+            _buttonFactory = factory;
             Parent = parent;
             ShouldCloseMenuAfterSelection = shouldCloseMenuAfterSelection;
-            _buttonFactory = factory;
         }
 
+        internal CircleMenuAction MenuAction { get; private set; }
         public List<CircleMenu> Children { get; } = new(8);
-        public GUIContent Icon { get; }
-        public string Path { get; }
         public bool ShouldCloseMenuAfterSelection { get; }
-        public Action OnSelected { get; protected set; }
 
-        internal ReadOnlySpan<VisualElement> BuildElements(ref ContextCircleMenuOption menuOption)
+        internal ReadOnlySpan<VisualElement> BuildElements(CircleMenuEventInformation information,
+            ref ContextCircleMenuOption menuOption)
         {
             if (!_alreadyInitialized)
             {
@@ -49,6 +45,9 @@ namespace ContextCircleMenu.Editor
                 OnInitialized(ref menuOption);
                 _alreadyInitialized = true;
             }
+
+            var buttonSpan = ButtonElements.AsSpan();
+            for (var i = 0; i < buttonSpan.Length; i++) buttonSpan[i].UpdateStatus(information);
 
             OnBuild();
 

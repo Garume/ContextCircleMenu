@@ -1,13 +1,9 @@
-using System;
-using UnityEngine;
-
 namespace ContextCircleMenu.Editor
 {
     /// <inheritdoc />
     public sealed class LeafCircleMenu : CircleMenu
     {
-        public LeafCircleMenu(string path, GUIContent icon, Action onSelected, IButtonFactory factory,
-            CircleMenu parent = null) : base(path, icon, onSelected, parent, factory)
+        public LeafCircleMenu(CircleMenuAction action, IButtonFactory factory) : base(action, factory)
         {
         }
 

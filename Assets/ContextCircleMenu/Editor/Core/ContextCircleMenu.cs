@@ -177,7 +177,8 @@ namespace ContextCircleMenu.Editor
         private void Rebuild()
         {
             Clear();
-            var elements = _selectedMenu.BuildElements(ref _option);
+            var circleMenuInfo = new CircleMenuEventInformation(_mousePosition, _position);
+            var elements = _selectedMenu.BuildElements(circleMenuInfo, ref _option);
             for (var i = 0; i < elements.Length; i++) Add(elements[i]);
         }
 
