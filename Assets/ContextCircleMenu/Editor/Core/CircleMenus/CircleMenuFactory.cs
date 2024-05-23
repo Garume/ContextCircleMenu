@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using UnityEditor;
+using UnityEditor.EditorTools;
 using UnityEngine;
 
 namespace ContextCircleMenu.Editor
@@ -54,28 +54,16 @@ namespace ContextCircleMenu.Editor
             return new LeafCircleMenu(_circleMenuAction, factory);
         }
     }
-
-    public class CircleMenuFactory : ICircleMenuFactory
+    
+    public class FilteredContextCircleMenuFactory : CircleMenuFactory
     {
-        private readonly Action _action;
-        private readonly GUIContent _content;
-
-        public CircleMenuFactory(string path, GUIContent content, Action action)
+        public Func<bool> Filter { get; }
+        public FilteredContextCircleMenuFactory(CircleMenuAction circleMenuAction, Func<bool> filter) : base(circleMenuAction)
         {
-            PathSegments = path.Split("/");
-            _content = content;
-            _action = action;
-        }
-
-
-        public IEnumerable<string> PathSegments { get; }
-
-        public CircleMenu Create(IButtonFactory factory)
-        {
-            return new LeafCircleMenu(_circleMenuAction, factory);
-        }
+            Filter = filter;
         }
     }
+    
 
     public class FolderMenuFactory : IFolderCircleMenuFactory
     {
