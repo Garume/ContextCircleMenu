@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using UnityEditor;
 using UnityEngine;
 
 namespace ContextCircleMenu.Editor
@@ -9,18 +10,35 @@ namespace ContextCircleMenu.Editor
     public sealed class CircleMenuBuilder
     {
         private readonly List<ICircleMenuFactory> _factories = new();
+        private Func<string> _basePathCallback;
         private IButtonFactory _buttonFactory;
+
         private IFolderCircleMenuFactory _folderFactory;
 
         internal CircleMenu Build(IMenuControllable menu)
         {
             _folderFactory ??= new FolderMenuFactory();
             _buttonFactory ??= new ButtonFactory();
+            
+            var basePath = _basePathCallback?.Invoke();
 
             CircleMenu root = _folderFactory.Create(string.Empty, menu, null, _buttonFactory);
             foreach (var factory in _factories)
             {
                 var pathSegments = factory.PathSegments.SkipLast(1);
+                
+                if (!string.IsNullOrEmpty(basePath))
+                {
+                    var basePathSegments = basePath.Split('/');
+                    if (pathSegments.Take(basePathSegments.Length).SequenceEqual(basePathSegments))
+                    {
+                        pathSegments = pathSegments.Skip(basePathSegments.Length);
+                    }else
+                    {
+                        continue;
+                    }
+                }
+                
                 var currentMenu = root;
                 foreach (var pathSegment in pathSegments)
                 {
@@ -102,5 +120,11 @@ namespace ContextCircleMenu.Editor
         {
             _buttonFactory = factory;
         }
+        
+        public void ConfigureBasePath(Func<string> basePathCallback)
+        {
+            _basePathCallback = basePathCallback;
+        }
+        
     }
 }
