@@ -21,7 +21,7 @@ namespace ContextCircleMenu.Editor
             CircleMenu root = _folderFactory.Create(string.Empty, menu, null, _buttonFactory);
             foreach (var factory in _factories)
             {
-                if (factory is FilteredContextCircleMenuFactory filteredFactory)
+                if (factory is FilteredCircleMenuFactory filteredFactory)
                 {
                     if (!filteredFactory.Filter())
                         continue;
@@ -87,7 +87,7 @@ namespace ContextCircleMenu.Editor
             GUIContent content = null)
         {
             var circleMenuAction = new CircleMenuAction(path, action, statusCallback, content);
-            AddMenu(new FilteredContextCircleMenuFactory(circleMenuAction, filter));
+            AddMenu(new FilteredCircleMenuFactory(circleMenuAction, filter));
         }
 
         /// <summary>
