@@ -9,20 +9,11 @@ namespace ContextCircleMenu.Editor
     {
         private Vector3[] _buttonPositions;
 
-        public FolderCircleMenu(string path, IMenuControllable menu,
-            GUIContent icon,
-            CircleMenu parent,
-            IButtonFactory factory) :
-            base(path, icon, null, parent, factory, false)
+        public FolderCircleMenu(string path, IMenuControllable menu, CircleMenu parent, IButtonFactory factory)
+            : base(new CircleMenuAction(path, null, EditorGUIUtility.IconContent(EditorIcons.FolderIcon))
+                , factory, parent, false)
         {
-            OnSelected = () => menu.Open(this);
-        }
-
-        internal FolderCircleMenu(string path, IMenuControllable menu,
-            CircleMenu parent,
-            IButtonFactory factory) :
-            this(path, menu, EditorGUIUtility.IconContent(EditorIcons.FolderIcon), parent, factory)
-        {
+            MenuAction.ActionCallback = _ => menu.Open(this);
         }
 
         /// <inheritdoc />
@@ -32,11 +23,7 @@ namespace ContextCircleMenu.Editor
             for (var index = 0; index < buttons.Length; index++)
             {
                 var item = Children[index];
-                var button = factory.Create(
-                    item.Path,
-                    item.Icon,
-                    item.OnSelected,
-                    Children.Count - index);
+                var button = factory.Create(item.MenuAction, Children.Count - index);
                 button.ShouldCloseMenuAfterSelection = item.ShouldCloseMenuAfterSelection;
                 buttons[index] = button;
             }
@@ -47,7 +34,7 @@ namespace ContextCircleMenu.Editor
         /// <inheritdoc />
         protected override VisualElement[] CreateUtilityElements(ref ContextCircleMenuOption menuOption)
         {
-            var label = new Label(Path)
+            var label = new Label(MenuAction.ActionName)
             {
                 style =
                 {

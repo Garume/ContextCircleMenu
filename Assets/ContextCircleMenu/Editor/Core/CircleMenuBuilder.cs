@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using UnityEditor;
 using UnityEngine;
 
 namespace ContextCircleMenu.Editor
@@ -9,26 +10,51 @@ namespace ContextCircleMenu.Editor
     public sealed class CircleMenuBuilder
     {
         private readonly List<ICircleMenuFactory> _factories = new();
+        private Func<string> _basePathCallback;
         private IButtonFactory _buttonFactory;
+
         private IFolderCircleMenuFactory _folderFactory;
 
         internal CircleMenu Build(IMenuControllable menu)
         {
             _folderFactory ??= new FolderMenuFactory();
             _buttonFactory ??= new ButtonFactory();
+            
+            var basePath = _basePathCallback?.Invoke();
 
             CircleMenu root = _folderFactory.Create(string.Empty, menu, null, _buttonFactory);
             foreach (var factory in _factories)
             {
+                if (factory is FilteredCircleMenuFactory filteredFactory)
+                {
+                    if (!filteredFactory.Filter())
+                        continue;
+                }
+                
                 var pathSegments = factory.PathSegments.SkipLast(1);
+                
+                if (!string.IsNullOrEmpty(basePath))
+                {
+                    var basePathSegments = basePath.Split('/');
+                    if (pathSegments.Take(basePathSegments.Length).SequenceEqual(basePathSegments))
+                    {
+                        pathSegments = pathSegments.Skip(basePathSegments.Length);
+                    }else
+                    {
+                        continue;
+                    }
+                }
+                
                 var currentMenu = root;
                 foreach (var pathSegment in pathSegments)
                 {
-                    var child = currentMenu.Children.Find(m => m.Path == pathSegment);
+                    var child = currentMenu.Children.Find(m => m.MenuAction.Path == pathSegment);
                     if (child == null)
                     {
                         child = _folderFactory.Create(pathSegment, menu, currentMenu, _buttonFactory);
-                        var backButton = _buttonFactory.CreateBackButton(menu.Back);
+                        var backMenuAction = new CircleMenuAction(pathSegment, _ => menu.Back(),
+                            _ => CircleMenuAction.Status.Normal, EditorGUIUtility.IconContent(EditorIcons.Back2x));
+                        var backButton = _buttonFactory.CreateBackButton(backMenuAction, -1);
                         backButton.ShouldCloseMenuAfterSelection = false;
                         child.PrepareButton(backButton);
                         currentMenu.Children.Add(child);
@@ -61,7 +87,24 @@ namespace ContextCircleMenu.Editor
         /// <param name="action"></param>
         public void AddMenu(string path, GUIContent content, Action action)
         {
-            AddMenu(new CircleMenuFactory(path, content, action));
+            var circleMenuAction = new CircleMenuAction(path, _ => action(), content);
+            AddMenu(new CircleMenuFactory(circleMenuAction));
+        }
+
+        public void AddMenu(string path, Action<CircleMenuEventInformation> action,
+            Func<CircleMenuEventInformation, CircleMenuAction.Status> statusCallback = null,
+            GUIContent content = null)
+        {
+            var circleMenuAction = new CircleMenuAction(path, action, statusCallback, content);
+            AddMenu(new CircleMenuFactory(circleMenuAction));
+        }
+        
+        public void AddMenuWithFilter(string path, Action<CircleMenuEventInformation> action, Func<bool> filter,
+            Func<CircleMenuEventInformation, CircleMenuAction.Status> statusCallback = null,
+            GUIContent content = null)
+        {
+            var circleMenuAction = new CircleMenuAction(path, action, statusCallback, content);
+            AddMenu(new FilteredCircleMenuFactory(circleMenuAction, filter));
         }
 
         /// <summary>
@@ -90,5 +133,11 @@ namespace ContextCircleMenu.Editor
         {
             _buttonFactory = factory;
         }
+        
+        public void ConfigureBasePath(Func<string> basePathCallback)
+        {
+            _basePathCallback = basePathCallback;
+        }
+        
     }
 }
