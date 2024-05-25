@@ -1,4 +1,4 @@
-using System;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -9,12 +9,11 @@ namespace ContextCircleMenu.Editor
         private readonly Color _hoverColor = new(0.2745098f, 0.3764706f, 0.4862745f, 1.0f);
         private readonly Color _normalColor = new(0.02f, 0.02f, 0.02f, 0.8f);
 
-        public SimpleCircleButton(string text, GUIContent icon, int section, Action onSelect) 
-            : base(text, icon, section, onSelect)
+        public SimpleCircleButton(CircleMenuAction menuAction, int section) : base(menuAction, section)
         {
         }
 
-        protected override void ModifierButton(Button button, string text, GUIContent icon, int section)
+        protected override void ModifierButton(Button button, CircleMenuAction menuAction, int section)
         {
             button.style.paddingLeft = 8f;
             button.style.paddingRight = 8f;
@@ -41,14 +40,14 @@ namespace ContextCircleMenu.Editor
                     marginRight = 5f,
                     flexGrow = 1
                 },
-                text = text
+                text = menuAction.ActionName.Split("/").Last()
             };
 
-            if (icon != null)
+            if (menuAction.Icon != null)
             {
                 var image = new Image
                 {
-                    image = icon.image,
+                    image = menuAction.Icon.image,
                     style =
                     {
                         width = 16f,

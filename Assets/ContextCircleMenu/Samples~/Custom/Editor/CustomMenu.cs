@@ -55,7 +55,7 @@ namespace ContextCircleMenu.Custom
     public class CustomFolderCircleMenu : FolderCircleMenu
     {
         public CustomFolderCircleMenu(string path, IMenuControllable menu, CircleMenu parent, IButtonFactory factory) :
-            base(path, menu, EditorGUIUtility.IconContent(EditorIcons.FolderIcon), parent, factory)
+            base(path, menu, parent, factory)
         {
         }
 
@@ -101,37 +101,37 @@ namespace ContextCircleMenu.Custom
 
     public class CustomButtonFactory : IButtonFactory
     {
-        public CircleButton Create(string path, GUIContent icon, Action onSelected, int section)
+        public CircleButton Create(CircleMenuAction menuAction, int section)
         {
-            return new OnlyImageCircleButton(path, icon, section, onSelected);
+            return new OnlyImageCircleButton(menuAction, section);
         }
 
-        public CircleButton CreateBackButton(Action onBack)
+        public CircleButton CreateBackButton(CircleMenuAction menuAction, int section)
         {
-            return new OnlyImageCircleButton("Back", EditorGUIUtility.IconContent(EditorIcons.Back2x),
-                -1, onBack);
+            menuAction.ActionName = "Back";
+            menuAction.Icon = EditorGUIUtility.IconContent(EditorIcons.Back2x);
+            return new OnlyImageCircleButton(menuAction, section);
         }
     }
 
     public class OnlyImageCircleButton : CircleButton
     {
-        public OnlyImageCircleButton(string text, GUIContent icon, int section, Action onSelect) : base(text, icon,
-            section, onSelect)
+        public OnlyImageCircleButton(CircleMenuAction menuAction, int section) : base(menuAction, section)
         {
         }
 
-        protected override void ModifierButton(Button button, string text, GUIContent icon, int section)
+        protected override void ModifierButton(Button button, CircleMenuAction menuAction, int section)
         {
             var image = new Image
             {
-                image = icon.image,
+                image = menuAction.Icon.image,
                 style =
                 {
                     width = 32f,
                     height = 32f,
                     flexShrink = 0
                 },
-                tooltip = text
+                tooltip = menuAction.ActionName
             };
 
             button.Add(image);

@@ -1,46 +1,49 @@
-using System;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace ContextCircleMenu.Editor
 {
     public abstract class CircleButton : VisualElement
     {
-        private readonly Action _onSelect;
         private Button _button;
+        private bool _shouldCloseMenuAfterSelection = true;
 
-        protected CircleButton(string text, GUIContent icon, int section, Action onSelect)
+        protected CircleButton(CircleMenuAction menuAction, int section)
         {
-            _onSelect = onSelect;
-
+            CircleMenuAction = menuAction;
             Section = section;
-
-            Initialize(text, icon, section);
+            Initialize();
         }
 
-        internal bool ShouldCloseMenuAfterSelection { get; set; } = true;
+        internal CircleMenuAction CircleMenuAction { get; }
 
-        public bool IsEntered { get; private set; }
-        public int Section { get; private set; }
-        private void Initialize(string text, GUIContent icon, int section)
+        internal bool ShouldCloseMenuAfterSelection
+        {
+            get => _shouldCloseMenuAfterSelection && CircleMenuAction.CurrentStatus == CircleMenuAction.Status.Normal;
+            set => _shouldCloseMenuAfterSelection = value;
+        }
+
+        public bool IsEntered { get; internal set; }
+        public int Section { get; }
+
+        private void Initialize()
         {
             style.position = Position.Absolute;
             style.alignItems = Align.Center;
 
-            _button = new Button(_onSelect);
-            ModifierButton(_button, text, icon, section);
+            _button = new Button(CircleMenuAction.Execute);
+            ModifierButton(_button, CircleMenuAction, Section);
             Add(_button);
 
             RegisterCallback<MouseEnterEvent>(InternalOnMouseEnter);
             RegisterCallback<MouseLeaveEvent>(InternalOnMouseLeave);
         }
 
-        protected abstract void ModifierButton(Button button, string text, GUIContent icon, int section);
+        protected abstract void ModifierButton(Button button, CircleMenuAction menuAction, int section);
 
         internal bool TryForceSelect()
         {
-            _onSelect?.Invoke();
-            return ShouldCloseMenuAfterSelection;
+            CircleMenuAction.Execute();
+            return ShouldCloseMenuAfterSelection && CircleMenuAction.CurrentStatus == CircleMenuAction.Status.Normal;
         }
 
         private void InternalOnMouseEnter(MouseEnterEvent evt)
@@ -61,6 +64,14 @@ namespace ContextCircleMenu.Editor
 
         protected virtual void OnMouseLeave(Button button, MouseLeaveEvent evt)
         {
+        }
+
+
+        internal void UpdateStatus(CircleMenuEventInformation information)
+        {
+            CircleMenuAction.UpdateStatus(information);
+            var enabled = CircleMenuAction.CurrentStatus == CircleMenuAction.Status.Normal;
+            _button.SetEnabled(enabled);
         }
     }
 }

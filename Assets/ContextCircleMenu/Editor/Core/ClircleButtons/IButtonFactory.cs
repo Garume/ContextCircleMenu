@@ -1,12 +1,9 @@
-using System;
-using UnityEngine;
-
 namespace ContextCircleMenu.Editor
 {
     public interface IButtonFactory
     {
-        public CircleButton Create(string path, GUIContent icon, Action onSelected, int section);
+        public CircleButton Create(CircleMenuAction menuAction, int section);
 
-        public CircleButton CreateBackButton(Action onBack);
+        public CircleButton CreateBackButton(CircleMenuAction menuAction, int section);
     }
 }
