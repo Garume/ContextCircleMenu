@@ -13,16 +13,20 @@ namespace ContextCircleMenu.Sandbox
         }
 
         [ContextCircleMenu("Instantiate/Cube", EditorIcons.PreMatCube)]
-        public static void InstantiateCube()
+        public static void InstantiateCube(CircleMenuEventInformation information)
         {
             var cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            cube.transform.position = Vector3.zero;
+            Debug.Log($"Position: {information.Position}");
+            HandleUtility.PlaceObject(information.Position, out var position, out var normal);
+            cube.transform.localPosition = position;
         }
 
         [ContextCircleMenu("Instantiate/Sphere", EditorIcons.PreMatSphere)]
-        public static void InstantiateSphere()
+        public static void InstantiateSphere(CircleMenuEventInformation information)
         {
             var sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            Debug.Log($"Position: {information.Position}");
+            HandleUtility.PlaceObject(information.Position, out var position, out var normal);
             sphere.transform.position = Vector3.zero;
         }
 

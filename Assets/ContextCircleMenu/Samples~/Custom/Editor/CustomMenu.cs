@@ -1,5 +1,4 @@
-﻿using System;
-using ContextCircleMenu.Editor;
+﻿using ContextCircleMenu.Editor;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -13,6 +12,10 @@ namespace ContextCircleMenu.Custom
         {
             ContextCircleMenuLoader.OnBuild += builder =>
             {
+                builder.AddMenu("Debug Test", new GUIContent(), () => Debug.Log("test"));
+                builder.AddMenu("Debug Test 2", EditorGUIUtility.IconContent(EditorIcons.ConsoleInfoIcon2x),
+                    () => Debug.Log("test2"));
+
                 builder.AddMenu("Custom/Debug Test", new GUIContent(), () => Debug.Log("custom/test"));
                 builder.AddMenu("Custom/Debug Test 2", EditorGUIUtility.IconContent(EditorIcons.ConsoleInfoIcon2x),
                     () => Debug.Log("custom/test2"));
@@ -22,22 +25,12 @@ namespace ContextCircleMenu.Custom
                 for (var i = 0; i < 5; i++)
                 {
                     var i1 = i;
-                    builder.AddMenu($"Custom/a/Debug Test {i}",
-                        EditorGUIUtility.IconContent(EditorIcons.ConsoleInfoIcon2x),
-                        () => Debug.Log($"custom/test{i1}"));
+                    builder.AddMenu($"Custom/Disable/Debug Test {i}",
+                        info => Debug.Log($"custom/test{i1}"),
+                        info => i1 % 2 == 0 ? CircleMenuAction.Status.Normal : CircleMenuAction.Status.Disabled,
+                        EditorGUIUtility.IconContent(EditorIcons.ConsoleInfoIcon2x));
                 }
 
-                for (var i = 0; i < 6; i++)
-                {
-                    var i1 = i;
-                    builder.AddMenu($"Custom/b/Debug Test {i}",
-                        EditorGUIUtility.IconContent(EditorIcons.ConsoleInfoIcon2x),
-                        () => Debug.Log($"custom/test{i1}"));
-                }
-
-                builder.AddMenu("Debug Test", new GUIContent(), () => Debug.Log("test"));
-                builder.AddMenu("Debug Test 2", EditorGUIUtility.IconContent(EditorIcons.ConsoleInfoIcon2x),
-                    () => Debug.Log("test2"));
                 builder.ConfigureButton(new CustomButtonFactory());
                 builder.ConfigureFolder(new CustomFolderMenuFactory());
             };
